@@ -1,0 +1,376 @@
+﻿<Window x:Class="BCstats.popup_1"
+        
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        
+        xmlns:assembly="clr-namespace:System;assembly=mscorlib"   
+        
+        xmlns:local="clr-namespace:BCstats"  
+             
+        WindowStartupLocation="CenterScreen"
+        
+        ShowInTaskbar="False"
+        ResizeMode="CanResizeWithGrip"
+        
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" 
+        
+        Title="播出时间表设置" 
+        Name="popupWindow1" 
+        
+        Loaded="popupWindow1_Loaded" 
+        
+        Height="450" Width="1200" 
+        MaxWidth="1200" MinWidth="815" 
+        MinHeight="450" MaxHeight="450" Icon="/BCstats;component/radio.ico">
+
+
+
+    <Window.Resources>
+
+        <!--dg_ElementStyle
+        DataGridTextColumn   列内容居中 TextBlock
+        TextWrapping：自动换行
+        -->
+        <Style x:Key="dg_ElementStyle"
+               TargetType="{x:Type TextBlock}">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+
+        <!--dg_HeaderStyle
+        DataGridColumnHeader 列标题居中-->
+        <Style x:Key="dg_HeaderStyle"
+               TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!--CellEditingElementStyle
+        TextBox 单元格编辑内容时的样式
+        EventSetter Event=: 用于给控件绑定事件
+        -->
+        <Style x:Key="CellEditingElementStyle"
+            TargetType="TextBox">
+            <Setter Property="Width" Value="65" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="MaxLength" Value="4" />
+
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+
+            <EventSetter Event="TextBox.PreviewKeyDown" Handler="tb_PreviewKeyDown" />
+            <EventSetter Event="TextBox.PreviewTextInput" Handler="tb_PreviewTextInput" />
+            <EventSetter Event="TextBox.PreviewMouseDown" Handler="tb_PreviewMouseDown" />
+            <EventSetter Event="TextBox.TextChanged" Handler="dg_tb_TextChanged" />
+
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Red"/>
+            <Setter Property="BorderThickness" Value="4"/>
+
+        </Style>
+
+        <Style x:Key="TextCellEditingElementStyle"
+            TargetType="TextBox">
+            <!--<Setter Property="Width" Value="65" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="MaxLength" Value="4" />-->
+
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+
+            <!--<EventSetter Event="TextBox.PreviewKeyDown" Handler="tb_PreviewKeyDown" />-->
+            <!--<EventSetter Event="TextBox.PreviewTextInput" Handler="tb_PreviewTextInput" />-->
+            <!--<EventSetter Event="TextBox.PreviewMouseDown" Handler="tb_PreviewMouseDown" />-->
+            <!--<EventSetter Event="TextBox.TextChanged" Handler="dg_tb_TextChanged" />-->
+
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Red"/>
+            <Setter Property="BorderThickness" Value="4"/>
+
+        </Style>
+
+
+
+
+
+
+
+
+
+
+
+        <!--TuesdayCheckBoxStyle
+        CheckBox 居中样式-->
+        <Style x:Key="TuesdayCheckBoxStyle"
+               TargetType="CheckBox">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="IsChecked" Value="False" />
+        </Style>
+
+        <!--CheckBoxEditingElementStyle
+        CheckBox 编辑样式-->
+        <Style x:Key="CheckBoxEditingElementStyle"
+            TargetType="CheckBox">
+            <Setter Property="BorderThickness" Value="3"/>
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+        </Style>
+
+
+        <!--DataGridRowStyle
+        DataGridRow  某行（被选中）行的样式       
+        -->
+        <!--
+        一般发生顺序：
+        dgRow IsMouseOver - (dgRow IsSelected) - dgCell IsSelected
+        注：设置dgCell IsSelected的话，会覆盖掉其他三种Trigger
+        -->
+
+        <Style x:Key="DataGridRowStyle"
+               TargetType="{x:Type DataGridRow}">
+            <Setter Property="Background" Value="White"/>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="FontFamily" Value="Arial" />
+                    <Setter Property="FontSize" Value="16" />
+
+                    <Setter Property="ToolTip" Value="双击编辑时间" />
+                    <Setter Property="ToolTipService.ShowDuration" Value="1500" />
+                    <Setter Property="ToolTipService.PlacementRectangle" Value="0,0,0,0" />
+                    <Setter Property="ToolTipService.VerticalOffset" Value="-2" />
+                    <Setter Property="ToolTipService.HasDropShadow" Value="true" />
+                    <Setter Property="ToolTipService.BetweenShowDelay" Value="3900" />
+
+                    <Setter Property="Background" Value="GreenYellow"/>
+                </Trigger>
+
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Height" Value="38"/>
+
+                    <Setter Property="Background" Value="Cornsilk"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="BorderBrush" Value="Black"/>
+
+                </Trigger>
+            </Style.Triggers>
+
+        </Style>
+
+        <!--DataGridCellStyle
+        DataGridCell  单元格（被选中）时的样式
+        
+        -->
+        <Style x:Key="DataGridCellStyle"
+            TargetType="DataGridCell">
+
+            <Style.Triggers >
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="OldLace"/>
+                    <Setter Property="Foreground" Value="Black"/>
+
+                    <Setter Property="FontSize" Value="16" />
+                    <Setter Property="FontFamily" Value="Arial" />
+                    <Setter Property="FontWeight" Value="Bold" />
+
+                    <Setter Property="ToolTip" Value="双击编辑，回车保存" />
+                    <Setter Property="ToolTipService.InitialShowDelay" Value="500" />
+                    <Setter Property="ToolTipService.ShowDuration" Value="2000" />
+                    <Setter Property="ToolTipService.PlacementRectangle" Value="0,0,0,0" />
+                    <Setter Property="ToolTipService.HorizontalOffset" Value="-10" />
+                    <Setter Property="ToolTipService.VerticalOffset" Value="3" />
+                    <Setter Property="ToolTipService.BetweenShowDelay" Value="3000" />
+
+                </Trigger>
+
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="FontFamily" Value="Arial" />
+                    <Setter Property="FontSize" Value="16" />
+
+                    <Setter Property="Background" Value="GreenYellow"/>
+
+
+                </Trigger>
+
+            </Style.Triggers>
+
+        </Style>
+
+
+    </Window.Resources>
+
+
+
+
+
+
+
+    <Grid Height="406" Background="Transparent" Width="1150">
+
+        <DataGrid Name="popup1_dataGrid1" 
+                  Margin="12,12,12,41" 
+                  FontSize="14"
+                  RowHeight="35" 
+                  Width="1150"
+                  
+                  AutoGenerateColumns="False" 
+                  
+                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                                   
+                  RowStyle="{StaticResource DataGridRowStyle}"   
+                  CellStyle="{StaticResource DataGridCellStyle}" 
+                  
+                  SelectionMode="Single"
+                  
+                  BeginningEdit="popup1_dataGrid1_BeginningEdit" 
+                  CellEditEnding="popup1_dataGrid1_CellEditEnding" >
+            <!--
+            AutoGenerateColumns: 自动生成列。
+                                 True： 自动生成。要跟 ItemsSource="{Binding xxx}"
+                                 False：要设置每个列的属性
+            
+            通过 RowEditEnding来获取新增的记录，就是每次编辑完行后，行失去焦点激发该事件。   
+            更新记录也是执行该事件
+            -->
+
+
+
+
+            <DataGrid.Columns>
+                <!--自定义DataGrid的列
+                 ElementStyle="{StaticResource contentCenterStyle}" 内容居中样式
+                 HeaderStyle="{StaticResource HeaderCenterStyle}"   列标题居中样式
+                 EditingElementStyle 编辑内容时的样式
+                -->
+                <DataGridTextColumn Header="ID"       HeaderStyle="{StaticResource dg_HeaderStyle}"  
+                                    IsReadOnly="True" CanUserResize="False" CanUserSort="True" Width="50"
+                                    ElementStyle="{StaticResource dg_ElementStyle}"  
+                                    EditingElementStyle="{StaticResource CellEditingElementStyle}"                                                      
+                                    Binding="{Binding id, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="分中心"   HeaderStyle="{StaticResource dg_HeaderStyle}" 
+                                    IsReadOnly="False" CanUserResize="False" Width="70"
+                                    ElementStyle="{StaticResource dg_ElementStyle}"    
+                                    EditingElementStyle="{StaticResource TextCellEditingElementStyle}"
+                                    Binding="{Binding city, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="台站"     HeaderStyle="{StaticResource dg_HeaderStyle}"   
+                                    IsReadOnly="False" CanUserResize="False"  Width="90"
+                                    ElementStyle="{StaticResource dg_ElementStyle}"
+                                    EditingElementStyle="{StaticResource TextCellEditingElementStyle}"     
+                                    Binding="{Binding station, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="频率"     HeaderStyle="{StaticResource dg_HeaderStyle}"   
+                                    IsReadOnly="False" CanUserResize="False" Width="150"
+                                    ElementStyle="{StaticResource dg_ElementStyle}" 
+                                    EditingElementStyle="{StaticResource TextCellEditingElementStyle}"                
+                                    Binding="{Binding frequency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <DataGridTextColumn Header="停止播出" CanUserResize="False" Width="65"
+                                    ElementStyle="{StaticResource dg_ElementStyle}"   
+                                    EditingElementStyle="{StaticResource CellEditingElementStyle}"
+                                    Binding="{Binding off_time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="开始播出" CanUserResize="False" Width="65" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}"   
+                                    EditingElementStyle="{StaticResource CellEditingElementStyle}"
+                                    Binding="{Binding on_time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="周三停播" CanUserResize="False" Width="65" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}"  
+                                    EditingElementStyle="{StaticResource CellEditingElementStyle}"
+                                    Binding="{Binding off_time_3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="周三播出" CanUserResize="False" Width="65" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}"   
+                                    EditingElementStyle="{StaticResource CellEditingElementStyle}"
+                                    Binding="{Binding on_time_3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <DataGridCheckBoxColumn Header="周二检修" CanUserResize="False"  Width="70" 
+                                    ElementStyle="{StaticResource TuesdayCheckBoxStyle}"  
+                                    EditingElementStyle="{StaticResource CheckBoxEditingElementStyle}"
+                                    Binding="{Binding stop_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="周二停播" CanUserResize="False" Width="65" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}" 
+                                    EditingElementStyle="{StaticResource CellEditingElementStyle}" 
+                                    Binding="{Binding off_time_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="周二播出" CanUserResize="False" Width="65" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}"   
+                                    EditingElementStyle="{StaticResource CellEditingElementStyle}"
+                                    Binding="{Binding on_time_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+
+                <DataGridCheckBoxColumn Header="最后周二检修" CanUserResize="False"  Width="100" 
+                                    ElementStyle="{StaticResource TuesdayCheckBoxStyle}"  
+                                    EditingElementStyle="{StaticResource CheckBoxEditingElementStyle}"
+                                    Binding="{Binding stop_last_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="最后周二停播" CanUserResize="False" Width="100" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}" 
+                                    EditingElementStyle="{StaticResource CellEditingElementStyle}" 
+                                    Binding="{Binding off_time_last_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="最后周二播出" CanUserResize="False" Width="100" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}"   
+                                    EditingElementStyle="{StaticResource CellEditingElementStyle}"
+                                    Binding="{Binding on_time_last_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!--<DataGridComboBoxColumn Header="周二检修否" 
+                                        x:Name="blogcatagory"
+                                        
+                                        Width="65"
+                                        SelectedValueBinding="{Binding Path=CatagoryId}"  
+                                        SelectedValuePath="Id" 
+                                        DisplayMemberPath="CatagoryName"
+                                        
+                                        />-->
+
+
+                <!--单独一列-->
+                <!--<DataGridTemplateColumn Header="周二检修否" Width="80" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=周二检修否}" 
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>               
+                            <ComboBox x:Name="Tuesday"      Width="80"
+                                  HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center"
+                                  ItemsSource="{Binding Source={StaticResource Tuesday}}"  
+                                  SelectedItem ="{Binding Path=周二检修否}"
+                                  IsSynchronizedWithCurrentItem="False"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>-->
+                <!--单独一列-->
+
+            </DataGrid.Columns>
+        </DataGrid>
+
+
+
+        <Button Content="刷新" Height="23" HorizontalAlignment="Left" Margin="375,373,0,0" Name="btnRefresh" VerticalAlignment="Top" Width="75" 
+                Click="btnRefresh_Click" />
+        <Button Content="保存" Height="23" HorizontalAlignment="Left" Margin="556,373,0,0" Name="btnSave" VerticalAlignment="Top" Width="75" Click="btnSave_Click" />
+        <Button Content="添加" Height="23" HorizontalAlignment="Left" Margin="467,373,0,0" Name="btnAdd" VerticalAlignment="Top" Width="75" 
+                Click="btnAdd_Click"  />
+        <Button Content="删除" Height="23" HorizontalAlignment="Left" Margin="648,373,0,0" Name="btnDelete" VerticalAlignment="Top" Width="75" 
+                Click="btnDelete_Click" RenderTransformOrigin="2.848,0.687"  />
+        
+        <Button Content="退出" Height="23" HorizontalAlignment="Left" Margin="738,373,0,0" Name="btnClosePopUp" VerticalAlignment="Top" Width="75" 
+                Click="btnClosePopUp_Click"  />
+    </Grid>
+</Window>
