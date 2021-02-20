@@ -7,6 +7,9 @@ using System.Windows;
 public sealed class BCstatsHelper {
 
     #region 连接数据库字符串
+    /// <summary>
+    /// 和本程序的.exe文件同在一个文件夹下
+    /// </summary>
     public static string connectionString = "data source = "
         + Environment.CurrentDirectory
         + "/bcstats.db";
@@ -40,19 +43,27 @@ public sealed class BCstatsHelper {
 
 
     /// <summary> 
-    /// TotalWeeks：统计一段时间内有多少个星期几 
+    /// 统计一段时间内有多少个星期几 
     /// </summary> 
-    /// <param name= "DateFrom "></param>开始日期
-    /// <param name= "DateTo "></param> 结束日期 
+    /// <param name= "dateFrom "></param>开始日期
+    /// <param name= "dateTo "></param> 结束日期 
     /// <param name= "DayOfWeek "></param>星期几
-    /// <returns> 返回个数 </returns> 
-    public static int TotalWeeks(DateTime DateFrom, DateTime DateTo, DayOfWeek DayOfWeek) {
-        TimeSpan vTimeSpan = new TimeSpan(DateTo.Ticks - DateFrom.Ticks);
-        int Result = (int)vTimeSpan.TotalDays / 7;
-        for (int i = 0; i <= vTimeSpan.TotalDays % 7; i++)
-            if (DateFrom.AddDays(i).DayOfWeek == DayOfWeek)
-                return Result + 1;
-        return Result;
+    /// <returns></returns>返回星期几的个数
+    public static int DayOfWeekConut(DateTime dateFrom, DateTime dateTo, DayOfWeek DayOfWeek) {
+        try {
+            TimeSpan vTimeSpan = new TimeSpan(dateTo.Ticks - dateFrom.Ticks);
+            int Result = (int)vTimeSpan.TotalDays / 7;
+            for (int i = 0; i <= vTimeSpan.TotalDays % 7; i++)
+                if (dateFrom.AddDays(i).DayOfWeek == DayOfWeek) {
+                    return Result + 1;
+                }
+            return Result;
+        } catch(Exception ex) {
+            MessageBox.Show("统计一段时间内有多少个星期几的参数错误：" + ex.ToString());
+            return 0;
+        }
+
+
     }
 
 
@@ -64,10 +75,9 @@ public sealed class BCstatsHelper {
     /// <returns></returns>
     public static int DaysCountOfTheMonth(int year, int month) {
         try {
-            return System.DateTime.DaysInMonth(Convert.ToInt32(year), Convert.ToInt32(month));
-
+            return System.DateTime.DaysInMonth(year, month);
         } catch (Exception ex) {
-            MessageBox.Show("获取天数的参数错误：" + ex.ToString());
+            MessageBox.Show("获取某年某月天数的参数错误：" + ex.ToString());
             return 0;
         }
     }
@@ -82,19 +92,19 @@ public sealed class BCstatsHelper {
     /// <returns></returns>
     public static int DayOfWeekConutOfTheMonth(int year, int month, DayOfWeek dayOfWeek) {
         try {
-            return TotalWeeks(
+            return DayOfWeekConut(
                 new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), 1),
                 new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), DaysCountOfTheMonth(year, month)),
                 dayOfWeek);
         } catch (Exception ex) {
-            MessageBox.Show("获取周几天数的参数错误：" + ex.ToString());
+            MessageBox.Show("获取某年某月周几天数的参数错误：" + ex.ToString());
             return 0;
         }
     }
 
 
     /// <summary>
-    /// 计算单个频率的月播出时间
+    /// 计算单个频率的当月播出时长
     /// </summary>
     /// <param name="year">年</param>
     /// <param name="month">月</param>
@@ -133,11 +143,11 @@ public sealed class BCstatsHelper {
             //MessageBox.Show("几个周二不停机检修：" + nonStop2);
             //MessageBox.Show("几个周三不停机检修：" + nonStop3);
 
-            #region 周二天数、每天播出小时
+            #region 周二天数、每天播出时长
             // 当月的周二的天数
-            int daysTues = TotalWeeks(
+            int daysTues = DayOfWeekConut(
                 new DateTime(year, month, 01), new DateTime(year, month, daysCountTheMonth), DayOfWeek.Tuesday);
-            // 当月的周二，每天播出小时
+            // 当月的周二，每天播出时长
             double tuesdayHours = offHour + offMin / 60      // 0点到停播
                         // 周二早上开机时间到下午关机时间：
                         // 周二下午关机时间 - 开机时间 off_time_2_hour - onhour
@@ -145,64 +155,60 @@ public sealed class BCstatsHelper {
                        // 周二下午开机时间到24点：24 - on_time_2_hour 
                      + (24 - (onHour2 + onMin2 / 60));
             #endregion
-            //MessageBox.Show("当月的周二，每天播出小时：" + tuesdayHours);
+            //MessageBox.Show("当月的周二，每天播出时长：" + tuesdayHours);
 
-            #region 周三天数、每天播出小时
+            #region 周三天数、每天播出时长
             // 当月的周三的天数
-            int daysWed = TotalWeeks(
+            int daysWed = DayOfWeekConut(
                 new DateTime(year, month, 01), new DateTime(year, month, daysCountTheMonth), DayOfWeek.Wednesday);
-            // 当月的周三，每天播出小时  0点到停播  + 开播到24点
+            // 当月的周三，每天播出时长： 0点到停播 + 开始播出到24点
             double wednesdayHours = offHour3 + offMin3 / 60 + (24 - (onHour3 + onMin3 / 60));
             #endregion
-            //MessageBox.Show("当月的周三，每天播出小时：" + wednesdayHours);
+            //MessageBox.Show("当月的周三，每天播出时长：" + wednesdayHours);
 
-            #region 当月的非周二周三天数、每天播出小时
+            #region 当月的非周二周三天数、每天播出时长
             // 当月的非周二周三天数
             int nonTuesWedDays = daysCountTheMonth - daysTues - daysWed;
-            // 当月的非周二周三，每天播出小时
-            double nonTuesWedHours = offHour + offMin / 60        // 0点到停播
-                                +
-                            (24 - (onHour + onMin / 60));  // + 开播到24点
+            // 当月的非周二周三，每天播出时长： 0点到停播  + 开始播出到24点
+            double nonTuesWedHours = offHour + offMin / 60 + (24 - (onHour + onMin / 60));
             #endregion
-            //MessageBox.Show("当月的非周二周三，每天播出小时：" + nonTuesWedHours);
+            //MessageBox.Show("当月的非周二周三，每天播出时长：" + nonTuesWedHours);
 
 
-            #region 总播出时间
-            // 一个月的周二的总播出时间
+            #region 总播出时长
+            // 当月的周二的总播出时长
             double totalTuesdayHours;
 
             //if(stop2) {
             //    // 周二停机检修，所以包括了最后一个周二停机检修
-            //    // 周二播出小时 * 周二天数
+            //    // 周二播出时长 * 周二天数
             //    totalTuesdayHours = tuesdayHours * (daysTues - nonStop2);
             //} else if(!stop2 & stopLast2) {
             //    // 只有最后一个周二停机检修，其余周二不停机检修
-            //    // 周二播出小时 * 周二天数，减去，最后一个周二停机检修的时长
+            //    // 周二播出时长 * 周二天数，减去，最后一个周二停机检修的时长
             //    totalTuesdayHours = tuesdayHours * (daysTues - nonStop2)
             //        - (onHourLast2 + onMinLast2 / 60 - (offHourLast2 + offMinLast2 / 60));
-
-
             //}
-
             //MessageBox.Show("最后一个周二停机检修？ " + stopLast2);
 
             if (!stopLast2) {
-                // 最后一个周二不停机检修，周二播出小时 * 周二天数
+                // 最后一个周二不停机检修，周二每天播出时长 * 周二天数
                 totalTuesdayHours = tuesdayHours * (daysTues - nonStop2);
             } else {
-                // 最后一个周二停机检修，则周二总播出时间，减去最后一个周二停机的时长
+                // 最后一个周二停机检修，则周二总播出时长，减去最后一个周二停机的时长
                 totalTuesdayHours = tuesdayHours * (daysTues - nonStop2)
                     - (onHourLast2 + onMinLast2 / 60 - (offHourLast2 + offMinLast2 / 60));
             }
-            // 一个月的周三的总播出时间：周三播出小时 * 周三天数
+
+            // 当月的周三的总播出时长：周三播出时长 * 周三天数
             double totalWednesdayHours = wednesdayHours * (daysWed - nonStop3);
-            // 一个月的非周二非周三的总播出时间：非周二/三播出小时 * 非周二/三天数
+            // 当月的非周二非周三的总播出时长：非周二/三播出时长 * 非周二/三天数
             // 重保期不停机检修：周二/三，按非周二/三的时间播出；
             // 则不停机检修的周二/三，都算入非周二周三的天数
             double totalNonTuesWedHours = nonTuesWedHours * (nonTuesWedDays + nonStop2 + nonStop3);
 
 
-            // 播出总小时；周二播出总时长 + 周三播出总时长 + 非周二/三播出总时长
+            // 播出总时长；周二播出总时长 + 周三播出总时长 + 非周二/三播出总时长
             double totalHours = totalTuesdayHours + totalWednesdayHours + totalNonTuesWedHours;
             #endregion
             //MessageBox.Show("播出总小时 = "
@@ -211,13 +217,10 @@ public sealed class BCstatsHelper {
             //    + "非周二/三播出总时长 " + totalNonTuesWedHours);
 
             // 四舍五入，保留一位
-            double temp = Math.Round(totalHours, 1, MidpointRounding.AwayFromZero); 
-            return temp;
+            return Math.Round(totalHours, 1, MidpointRounding.AwayFromZero);
         } catch {
             return 0; 
         }
-
-
     }
 
 
@@ -287,27 +290,27 @@ public sealed class BCstatsHelper {
     public static string GetStopRate(double stopTotalTime, double totalTime) {
         double stopRate;
         try {
-            stopRate = 
+            stopRate =
                 Math.Round(stopTotalTime / Convert.ToDouble(totalTime), 3, MidpointRounding.AwayFromZero);
-            // 除于0.6后，只保留整数位
+            // 得到的秒数除于0.6后，只保留整数位
             int int_stoprate = (int)(stopRate / 0.600);
 
             // 停播率 < 1 min    eg.  = 0.0389, ---- 3.9s
             if (stopRate < 0.600) {
                 return Math.Round((stopRate * 100), 1, MidpointRounding.AwayFromZero).ToString() + "s";
-            } // > 1 min , < 1 h
+            } // 停播率 > 1 min , < 1 h
             else if (0.600 < stopRate && stopRate < 36.000) {
                 return int_stoprate.ToString() + "min " +   // 分
                     Math.Round((stopRate * 100 % 60), 1, MidpointRounding.AwayFromZero).ToString() + "s";  // 秒，对60取模，保留1位小数                      
-            } // > 1 h
+            } // 停播率 > 1 h
             else if (stopRate > 36.000) {
                 return ((int)(stopRate / 36)).ToString() + "h " +
                     (int)((stopRate % 36) / 0.6) + "min " +
                     Math.Round((stopRate * 100 % 60), 1, MidpointRounding.AwayFromZero).ToString() + "s";  // 秒，对60取模，保留1位小数     
-            } // 1 min 
+            } // 停播率 = 1 min 
             else if (stopRate == 0.600) {
                 return "1 min";
-            } // 1 h
+            } // 停播率 = 1 h
             else if (stopRate == 36.000) {
                 return "1 h";
             } else {

@@ -344,6 +344,36 @@ class SQLiteHelper {
     }
 
 
+    /// <summary>
+    /// 获取数据表中某一列的所有不重复的值
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <param name="columnName"></param>
+    /// <param name="whereName"></param>
+    /// <param name="whereValue"></param>
+    /// <returns></returns>
+    public List<string> GetColunmValues(string connectionString,
+                                string columnName,
+                                string whereName, string whereValue) {
+        try {
+            string sql;
+            if (whereName != null && whereValue != null) {
+                sql = string.Format("SELECT DISTINCT {0} FROM {1} WHERE {2}='{3}'",
+                    columnName, BCstatsHelper.tableName,
+                    whereName, whereValue);
+            } else {
+                sql = string.Format("SELECT DISTINCT {0} FROM {1}", columnName, BCstatsHelper.tableName);
+            }
+            //MessageBox.Show(sql);
+            // 获取数据表中某一列的所有不重复的值
+            return GetColmn(connectionString, sql);
+        } catch {
+            return null;
+        }
+    }
+
+
+
 
 
 
