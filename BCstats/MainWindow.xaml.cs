@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Text.RegularExpressions;     //System.Windows.Threading.DispatcherTimer
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
+using System.Data;
 
 namespace BCstats {
     /// <summary>
@@ -16,11 +17,7 @@ namespace BCstats {
 
         #region SQLite 常量定义
         BCstatsHelper bcHelper = new BCstatsHelper();
-
         SQLiteHelper sqliteHelper = new SQLiteHelper(BCstatsHelper.connectionString);
-
-        // TODO 数据库文件路径
-
         #endregion
 
 
@@ -117,7 +114,7 @@ namespace BCstats {
         /// <param name="columnName">字段名</param>
         /// <param name="whereName">where 字段名</param>
         /// <param name="whereValue">where 字段的值</param>
-        /// <param name="functionName">函数名，用于报错</param>
+        /// <param name="functionName">控件的事件名称，用于报错</param>
         private void getComboBoxBinding(ComboBox cbox, SQLiteHelper sqliteHelper,
                                         string connectionString, 
                                         string columnName, 
@@ -126,23 +123,19 @@ namespace BCstats {
             try {
                 // 先清除ComboBox下拉选项
                 cbox.Items.Clear();
-                string sql;
+
                 List<string> columnValueList = null;
-                if (whereName != null && whereValue != null) {
-                    sql = string.Format("SELECT DISTINCT {0} FROM {1} WHERE {2}='{3}'", 
-                        columnName, BCstatsHelper.tableName,
-                        whereName, whereValue);
-                } else {
-                    sql = string.Format("SELECT DISTINCT {0} FROM {1}", columnName, BCstatsHelper.tableName);
-                }
                 //MessageBox.Show(sql);
-                columnValueList = sqliteHelper.GetColmn(connectionString, sql);
+                // 获取数据表中某一列的所有不重复的值
+                columnValueList = sqliteHelper.GetColunmValues(connectionString, 
+                    columnName,
+                    whereName, whereValue);
                 for (int i = 0; i < columnValueList.Count; i++) {
                     cbox.Items.Add(columnValueList[i]);
                 }
                 cbox.SelectedIndex = -1;
             } catch(Exception ex) {
-                MessageBox.Show(functionName + "函数错误：" + ex.ToString());
+                MessageBox.Show(functionName + " 事件错误：" + ex.ToString());
             }
         }
 
@@ -164,14 +157,10 @@ namespace BCstats {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnPopup_Click(object sender, RoutedEventArgs e) {
+        private void btnPopup_TimeTable_Click(object sender, RoutedEventArgs e) {
             // 保持弹出窗口在主窗口前
-            var popup = new popup_1(windows1);
-            popup.ShowDialog();     //
-            // 主窗口也可以控制
-            //popup.Show();     
-
-            //popup.Title = "播出时间表设置";
+            var popup = new TimeTableWindow(windows1);
+            popup.ShowDialog();
         }
 
         /// <summary>
@@ -183,7 +172,7 @@ namespace BCstats {
             this.Close();
         }
 
-    
+
         #region TabItem3 台站播出统计 comboBox 下拉菜单 绑定数据库
         /// <summary>
         /// 台站播出统计 下拉菜单：分中心，点击下拉的时候绑定
@@ -191,16 +180,12 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cboxCity_DropDownClosed(object sender, EventArgs e) {
-            try {
-                if (!string.IsNullOrEmpty(cboxCity.Text) && cboxCity.Text.Length != 0) {
-                    getComboBoxBinding(cboxStation, sqliteHelper,
-                        BCstatsHelper.connectionString,
-                        "station", 
-                        "city", cboxCity.Text,
-                        "cboxCity_DropDownClosed");
-                }
-            } catch (Exception ex) {
-                MessageBox.Show("cboxCity_DropDownClosed:" + ex.ToString());
+            if (!string.IsNullOrEmpty(cboxCity.Text) && cboxCity.Text.Length != 0) {
+                getComboBoxBinding(cboxStation, sqliteHelper,
+                    BCstatsHelper.connectionString,
+                    BCstatsHelper.STR_STATION,
+                    BCstatsHelper.STR_CITY, cboxCity.Text,
+                    "cboxCity_DropDownClosed");
             }
         }
         /// <summary>
@@ -209,16 +194,12 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cboxCity_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            try {
-                if (!string.IsNullOrEmpty(cboxCity.Text) && cboxCity.Text.Length != 0) {
-                    getComboBoxBinding(cboxStation, sqliteHelper,
-                        BCstatsHelper.connectionString,
-                        "station", 
-                        "city", cboxCity.Text,
-                        "cboxCity_SelectionChanged");
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.ToString());
+            if (!string.IsNullOrEmpty(cboxCity.Text) && cboxCity.Text.Length != 0) {
+                getComboBoxBinding(cboxStation, sqliteHelper,
+                    BCstatsHelper.connectionString,
+                    BCstatsHelper.STR_STATION,
+                    BCstatsHelper.STR_CITY, cboxCity.Text,
+                    "cboxCity_SelectionChanged");
             }
         }
         /// <summary>
@@ -227,15 +208,12 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cboxStation_DropDownClosed(object sender, EventArgs e) {
-            try {
-                getComboBoxBinding(cboxFrequency, sqliteHelper, BCstatsHelper.connectionString,
-                    "frequency",
-                    "station", cboxStation.Text,
-                    "cboxStation_DropDownClosed");
-            } catch (Exception ex) {
-                MessageBox.Show(ex.ToString());
-            }
+            getComboBoxBinding(cboxFrequency, sqliteHelper, BCstatsHelper.connectionString,
+                BCstatsHelper.STR_FREQUENCY,
+                BCstatsHelper.STR_STATION, cboxStation.Text,
+                "cboxStation_DropDownClosed");
         }
+
         /// <summary>
         /// 台站播出统计 下拉菜单：频率 点击下拉的时候，计算总播出时间
         /// </summary>
@@ -341,17 +319,16 @@ namespace BCstats {
                                                    off_time_last_2_hour, off_time_last_2_min,
                                                    on_time_last_2_hour, on_time_last_2_min,
                                                    off_time_3_hour, off_time_3_min,
-                                                   on_time_3_hour, on_time_3_min).ToString();
+                                                   on_time_3_hour, on_time_3_min)
+                                                   .ToString();
 
                 } else {
                     Hours.Text = "0";
                 }
-            } catch(Exception ex) {
-                //MessageBox.Show(ex.ToString());
+            } catch {
                 Hours.Text = "0";
             }
         }
-
 
         #endregion
 
@@ -380,8 +357,8 @@ namespace BCstats {
             DateTime dateFrom = new DateTime(theYear, theMonth, 01);
             DateTime dateTo = new DateTime(theYear, theMonth, daysTheMonth);
             // 月份变化，周二/三的最大值重新界定，为当月的周二/三天数
-            scbNoStop2.Maximum = BCstatsHelper.TotalWeeks(dateFrom, dateTo, DayOfWeek.Tuesday);
-            scbNoStop3.Maximum = BCstatsHelper.TotalWeeks(dateFrom, dateTo, DayOfWeek.Wednesday);
+            scbNoStop2.Maximum = BCstatsHelper.DayOfWeekConut(dateFrom, dateTo, DayOfWeek.Tuesday);
+            scbNoStop3.Maximum = BCstatsHelper.DayOfWeekConut(dateFrom, dateTo, DayOfWeek.Wednesday);
 
             // 计算播出时长
             if (cboxCity.SelectedIndex != -1
@@ -405,8 +382,8 @@ namespace BCstats {
             DateTime dateFrom = new DateTime(theYear, theMonth, 01);
             DateTime dateTo = new DateTime(theYear, theMonth, daysTheMonth);
             // 月份变化，周二/三的最大值重新界定，为当月的周二/三天数
-            scbNoStop2.Maximum = BCstatsHelper.TotalWeeks(dateFrom, dateTo, DayOfWeek.Tuesday);
-            scbNoStop3.Maximum = BCstatsHelper.TotalWeeks(dateFrom, dateTo, DayOfWeek.Wednesday);
+            scbNoStop2.Maximum = BCstatsHelper.DayOfWeekConut(dateFrom, dateTo, DayOfWeek.Tuesday);
+            scbNoStop3.Maximum = BCstatsHelper.DayOfWeekConut(dateFrom, dateTo, DayOfWeek.Wednesday);
 
             // 计算播出时长
             if (cboxCity.SelectedIndex != -1
@@ -646,7 +623,7 @@ namespace BCstats {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void scb_Year_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e) {
+        private void scb_Year_Scroll(object sender, ScrollEventArgs e) {
             int theYear = Convert.ToInt32(scb_Year.Value);
             int theMonth = Convert.ToInt32(scb_Month.Value);
             // 当月天数
@@ -655,15 +632,15 @@ namespace BCstats {
             DateTime dateFrom = new DateTime(theYear, theMonth, 01);
             DateTime dateTo = new DateTime(theYear, theMonth, daysTheMonth);
             // 月份变化，周二/三的最大值重新界定，为当月的周二/三天数
-            scb_NoStop2.Maximum = BCstatsHelper.TotalWeeks(dateFrom, dateTo, DayOfWeek.Tuesday);
-            scb_NoStop3.Maximum = BCstatsHelper.TotalWeeks(dateFrom, dateTo, DayOfWeek.Wednesday);
+            scb_NoStop2.Maximum = BCstatsHelper.DayOfWeekConut(dateFrom, dateTo, DayOfWeek.Tuesday);
+            scb_NoStop3.Maximum = BCstatsHelper.DayOfWeekConut(dateFrom, dateTo, DayOfWeek.Wednesday);
         }
         /// <summary>
         /// 月播出时间统计：滚动条 月
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void scb_Month_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e) {
+        private void scb_Month_Scroll(object sender, ScrollEventArgs e) {
             int theYear = Convert.ToInt32(scb_Year.Value);
             int theMonth = Convert.ToInt32(scb_Month.Value);
             // 当月天数
@@ -672,8 +649,8 @@ namespace BCstats {
             DateTime dateFrom = new DateTime(theYear, theMonth, 01);
             DateTime dateTo = new DateTime(theYear, theMonth, daysTheMonth);
             // 月份变化，周二/三的最大值重新界定，为当月的周二/三天数
-            scb_NoStop2.Maximum = BCstatsHelper.TotalWeeks(dateFrom, dateTo, DayOfWeek.Tuesday);
-            scb_NoStop3.Maximum = BCstatsHelper.TotalWeeks(dateFrom, dateTo, DayOfWeek.Wednesday);
+            scb_NoStop2.Maximum = BCstatsHelper.DayOfWeekConut(dateFrom, dateTo, DayOfWeek.Tuesday);
+            scb_NoStop3.Maximum = BCstatsHelper.DayOfWeekConut(dateFrom, dateTo, DayOfWeek.Wednesday);
         }
 
         /// <summary>
@@ -697,16 +674,12 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cbx_city_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            try {
-                if (!string.IsNullOrEmpty(cbx_city.Text) && cbx_city.Text.Length != 0) {
-                    getComboBoxBinding(cbx_station, sqliteHelper,
-                        BCstatsHelper.connectionString,
-                        "station",
-                        "city", cbx_city.Text,
-                        "cbx_city_SelectionChanged");
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.ToString());
+            if (!string.IsNullOrEmpty(cbx_city.Text) && cbx_city.Text.Length != 0) {
+                getComboBoxBinding(cbx_station, sqliteHelper,
+                    BCstatsHelper.connectionString,
+                    BCstatsHelper.STR_STATION,
+                    BCstatsHelper.STR_CITY, cbx_city.Text,
+                    "cbx_city_SelectionChanged");
             }
         }
         /// <summary>
@@ -715,16 +688,12 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cbx_city_DropDownClosed(object sender, EventArgs e) {
-            try {
-                if (!string.IsNullOrEmpty(cbx_city.Text) && cbx_city.Text.Length != 0) {
-                    getComboBoxBinding(cbx_station, sqliteHelper,
-                        BCstatsHelper.connectionString,
-                        "station",
-                        "city", cbx_city.Text,
-                        "cbx_city_DropDownClosed");
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.ToString());
+            if (!string.IsNullOrEmpty(cbx_city.Text) && cbx_city.Text.Length != 0) {
+                getComboBoxBinding(cbx_station, sqliteHelper,
+                    BCstatsHelper.connectionString,
+                    BCstatsHelper.STR_STATION,
+                    BCstatsHelper.STR_CITY, cbx_city.Text,
+                    "cbx_city_DropDownClosed");
             }
         }
         /// <summary>
@@ -733,14 +702,10 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cbx_station_DropDownClosed(object sender, EventArgs e) {
-            try {
-                getComboBoxBinding(cbx_frequency, sqliteHelper, BCstatsHelper.connectionString,
-                    "frequency",
-                    "station", cbx_station.Text,
-                    "cbx_station_DropDownClosed");
-            } catch (Exception ex) {
-                MessageBox.Show(ex.ToString());
-            }
+            getComboBoxBinding(cbx_frequency, sqliteHelper, BCstatsHelper.connectionString,
+                BCstatsHelper.STR_FREQUENCY,
+                BCstatsHelper.STR_STATION, cbx_station.Text,
+                "cbx_station_DropDownClosed");
         }
         /// <summary>
         /// 月播出时间统计：下拉菜单 频率：填充多个输入框的时间值
@@ -967,7 +932,7 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void grid1_textbox_TextChanged(object sender, TextChangedEventArgs e) {
-            TextBox tbx = (TextBox)sender;     //调用sender
+            TextBox tbx = (TextBox)sender;
             var reg = new Regex("^[0-9]*$");
             var str = tbx.Text.Trim();
             var sb = new StringBuilder();
@@ -976,7 +941,7 @@ namespace BCstats {
                     if (reg.IsMatch(str[i].ToString())) { sb.Append(str[i].ToString()); }
                 }
                 tbx.Text = sb.ToString();
-                //定义输入焦点在最后一个字符
+                // 定义输入焦点在最后一个字符
                 tbx.SelectionStart = tbx.Text.Length;
             }
         }  
@@ -1240,7 +1205,158 @@ namespace BCstats {
             }
         }
 
+
         #endregion
+
+        /// <summary>
+        /// 台站播出统计：按钮 弹出窗口，台站播出数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnPopUp_StationStats_Click(object sender, RoutedEventArgs e) {
+            DataTable dt = new DataTable();
+            if (cboxCity.SelectedIndex != -1 
+                && cboxStation.SelectedIndex != -1
+                && cboxFrequency.SelectedIndex != -1) {
+
+                int year = Convert.ToInt32(scbYear.Value);
+                int month = Convert.ToInt32(scbMonth.Value);
+                string city = cboxCity.Text;
+                string station = cboxStation.Text;
+
+                List<string> list = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString,
+                    BCstatsHelper.STR_FREQUENCY,
+                    BCstatsHelper.STR_STATION, cboxStation.Text);
+
+                dt.Columns.Add("frequency");
+                dt.Columns.Add("hours");
+
+                for (int i = 0; i < list.Count; i++) {
+                    DataRow dr = dt.NewRow();
+                    dr["frequency"] = list[i];
+                    dr["hours"] = GetFrequencyHours(year, month, city, station, list[i]);
+                    dt.Rows.Add(dr);
+                }
+
+            }
+            Console.WriteLine("mw - d.Rows.Count: " + dt.Rows.Count);
+
+            var ssw = new StationStatsWindow(windows1, dt);
+            // 子窗口的位置：紧贴在主窗口右侧
+            ssw.Height = this.Height;
+            ssw.WindowStartupLocation = WindowStartupLocation.Manual;
+            ssw.Left = this.Left + this.Width;
+            ssw.Top = this.Top + (this.Height - ssw.Height) / 2;
+            ssw.Show();
+        }
+
+
+
+
+
+
+
+        private string GetFrequencyHours(int year, int month,
+            string city, string station, string frequency) {
+            try {
+                double off_time_hour, off_time_min, on_time_hour, on_time_min;
+                bool stop2, stopLast2;
+                double off_time_2_hour, off_time_2_min, 
+                    on_time_2_hour, on_time_2_min;
+                double off_time_last_2_hour, off_time_last_2_min, 
+                    on_time_last_2_hour, on_time_last_2_min;
+                double off_time_3_hour, off_time_3_min, 
+                    on_time_3_hour, on_time_3_min;
+
+                // 停止播出
+                string off_time = sqliteHelper.GetTimeValue(city, station,
+                    frequency, BCstatsHelper.STR_OFF_TIME);
+                off_time_hour = Convert.ToDouble(off_time.Substring(0, 2));
+                off_time_min = Convert.ToDouble(off_time.Substring(2, 2));
+
+                // 开始播出
+                string on_time = sqliteHelper.GetTimeValue(city, station,
+                    frequency, BCstatsHelper.STR_ON_TIME);
+                on_time_hour = Convert.ToDouble(on_time.Substring(0, 2));
+                on_time_min = Convert.ToDouble(on_time.Substring(2, 2));
+
+                // 周三停播
+                string off_time_3 = sqliteHelper.GetTimeValue(city, station,
+                    frequency, BCstatsHelper.STR_OFF_TIME_3);
+                off_time_3_hour = Convert.ToDouble(off_time_3.Substring(0, 2));
+                off_time_3_min = Convert.ToDouble(off_time_3.Substring(2, 2));
+                // 周三播出
+                string on_time_3 = sqliteHelper.GetTimeValue(city, station,
+                    frequency, BCstatsHelper.STR_ON_TIME_3);
+                on_time_3_hour = Convert.ToDouble(on_time_3.Substring(0, 2));
+                on_time_3_min = Convert.ToDouble(on_time_3.Substring(2, 2));
+
+                // 周二是否停机检修
+                int stop_2 = sqliteHelper.GetIntValue(city, station,
+                    frequency, BCstatsHelper.STR_STOP_2);
+                if (stop_2 == 1)
+                    stop2 = true;
+                else stop2 = false;
+                // 周二停播
+                string off_time_2 = sqliteHelper.GetTimeValue(city, station,
+                    frequency, BCstatsHelper.STR_OFF_TIME_2);
+                off_time_2_hour = Convert.ToDouble(off_time_2.Substring(0, 2));
+                off_time_2_min = Convert.ToDouble(off_time_2.Substring(2, 2));
+                // 周二播出
+                string on_time_2 = sqliteHelper.GetTimeValue(city, station,
+                    frequency, BCstatsHelper.STR_ON_TIME_2);
+                on_time_2_hour = Convert.ToDouble(on_time_2.Substring(0, 2));
+                on_time_2_min = Convert.ToDouble(on_time_2.Substring(2, 2));
+
+                // 最后一个周二是否停机检修
+                int stop_last_2 = sqliteHelper.GetIntValue(city, station,
+                    frequency, BCstatsHelper.STR_STOP_LAST_2);
+                if (stop_last_2 == 1) {
+                    stopLast2 = true;
+                    rbtnLastTuesday.IsChecked = true;
+                    // 最后一个周二停机检修
+                } else {
+                    stopLast2 = false;
+                    rbtnLastTuesday.IsChecked = false;
+                    // 最后一个周二不停机检修
+                }
+
+                // 最后一个周二停播
+                string off_time_last_2 = sqliteHelper.GetTimeValue(city, station,
+                    frequency, BCstatsHelper.STR_OFF_TIME_LAST_2);
+                off_time_last_2_hour = Convert.ToDouble(off_time_last_2.Substring(0, 2));
+                off_time_last_2_min = Convert.ToDouble(off_time_last_2.Substring(2, 2));
+                // 最后一个周二播出
+                string on_time_last_2 = sqliteHelper.GetTimeValue(city, station,
+                    frequency, BCstatsHelper.STR_ON_TIME_LAST_2);
+                on_time_last_2_hour = Convert.ToDouble(on_time_last_2.Substring(0, 2));
+                on_time_last_2_min = Convert.ToDouble(on_time_last_2.Substring(2, 2));
+
+                // 当月播出总小时
+                return BCstatsHelper.TotalHoursOfTheMonth(
+                                                year, month,
+                                                Convert.ToInt32(scbNoStop2.Value),
+                                                Convert.ToInt32(scbNoStop3.Value),
+                                                off_time_hour, off_time_min,
+                                                on_time_hour, on_time_min,
+                                                stop2,
+                                                off_time_2_hour, off_time_2_min,
+                                                on_time_2_hour, on_time_2_min,
+                                                stopLast2,
+                                                off_time_last_2_hour, off_time_last_2_min,
+                                                on_time_last_2_hour, on_time_last_2_min,
+                                                off_time_3_hour, off_time_3_min,
+                                                on_time_3_hour, on_time_3_min)
+                                                .ToString();
+            } catch {
+                return "0";
+            }
+        }
+
+
+
+
+
 
 
     }
