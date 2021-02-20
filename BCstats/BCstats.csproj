@@ -86,10 +86,17 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BCstatsHelper.cs" />
-    <Compile Include="popup_1.xaml.cs">
-      <DependentUpon>popup_1.xaml</DependentUpon>
+    <Compile Include="StationStatsWindow.xaml.cs">
+      <DependentUpon>StationStatsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TimeTableWindow.xaml.cs">
+      <DependentUpon>TimeTableWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SQLiteHelper.cs" />
+    <Page Include="MyStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -102,7 +109,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="popup_1.xaml">
+    <Page Include="StationStatsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TimeTableWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
