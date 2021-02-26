@@ -20,7 +20,7 @@ namespace BCstats {
             InitializeComponent();
         }
 
-        #region 常量定义
+        #region SQLite 常量定义
         private SQLiteHelper helper = new SQLiteHelper(BCstatsHelper.connectionString);
         #endregion
 
@@ -177,32 +177,13 @@ namespace BCstats {
             }
         }
 
-
-        /// <summary>
-        /// 打印数组
-        /// </summary>
-        /// <param name="arr"></param>
-        void PrintArray(ArrayList arr) {
-            string str = "[";
-            for (int i = 0; i < arr.Count; i++) {
-                str += arr[i].ToString();
-                if (i != arr.Count - 1) {
-                    str += ',';
-                }
-            }
-            str += "]";
-            Console.WriteLine(str);
-        }
-
-
-
         /// <summary>
         /// 按钮：关闭窗口
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnClosePopUp_Click(object sender, RoutedEventArgs e) {
-            this.ttWindow.Close();
+            this.Close();
             // 主窗口的下拉菜单变为未选中，计算播出时长结果清零，周二检修选框变为未选中
             MainWindow mw = Application.Current.Windows[0] as MainWindow;
             mw.cboxFrequency.SelectedIndex = -1;
@@ -211,6 +192,14 @@ namespace BCstats {
             mw.Hours.Text = string.Empty;
             mw.rbtnLastTuesday.IsChecked = false;
             mw.chkBox_Tuesday.IsChecked = false;
+            // 关闭台站播出统计子窗口
+            if (Application.Current.Windows.Count == 4) {
+                StationStatsWindow sw = Application.Current.Windows[2] as StationStatsWindow;
+                sw.Close();
+            }
+            // 主窗口位置恢复到屏幕中央
+            mw.Left = MainWindow.mwLeft;
+            mw.Top = MainWindow.mwTop;
         }
 
 

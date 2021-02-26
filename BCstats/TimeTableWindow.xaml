@@ -6,19 +6,17 @@
              
         WindowStartupLocation="CenterScreen"
         ShowInTaskbar="False"
-        ResizeMode="CanResizeWithGrip"
+        ResizeMode="NoResize"
         Title="播出时间表设置" 
         Name="ttWindow" 
-        Height="450" Width="1200" 
-        MaxWidth="1200" MinWidth="815" 
-        MinHeight="450" MaxHeight="450" 
+        Height="450" Width="1280" 
+        Background="White"
         Icon="/BCstats;component/radio.ico"
-        Loaded="TimeTableWindow_Loaded"
-        >
+        Loaded="TimeTableWindow_Loaded">
 
     <Window.Resources>
-        
-            <Style x:Key="CellEditingElementStyle"
+
+        <Style x:Key="CellEditingElementStyle"
             TargetType="TextBox">
             <Setter Property="Width" Value="65" />
             <Setter Property="Height" Value="38" />
@@ -67,24 +65,24 @@
         </Style>
 
     </Window.Resources>
-    
 
-    <Grid Height="406" Background="Transparent" Width="1150">
 
-        <DataGrid Name="TimeTableWindow_dataGrid1" 
-                  Margin="12,12,12,41" 
+    <Grid Height="Auto" Width="Auto" Background="Transparent" Margin="10,7,3.6,7">
+
+        <DataGrid Name="TimeTableWindow_dataGrid1" Width="Auto"
+                  Margin="0,0,0,53" 
                   FontSize="14"
-                  RowHeight="35" 
-                  Width="1150"
+                  RowHeight="60"
                   
+                  ColumnWidth="*"
+                  SelectionMode="Single"
                   AutoGenerateColumns="False" 
                   
                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-                                   
+                  ScrollViewer.CanContentScroll="False"
+                  
                   RowStyle="{StaticResource DataGridRowStyle}"   
                   CellStyle="{StaticResource DataGridCellStyle}" 
-                  
-                  SelectionMode="Single"
                   
                   BeginningEdit="TimeTableWindow_dataGrid1_BeginningEdit" 
                   CellEditEnding="TimeTableWindow_dataGrid1_CellEditEnding" >
@@ -104,67 +102,78 @@
                  EditingElementStyle 编辑内容时的样式
                 -->
                 <DataGridTextColumn Header="ID"       HeaderStyle="{StaticResource dg_HeaderStyle}"  
-                                    IsReadOnly="True" CanUserResize="False" CanUserSort="True" Width="50"
+                                    Visibility="Hidden"
+                                    IsReadOnly="True" CanUserResize="False" CanUserSort="True" Width="*"
                                     ElementStyle="{StaticResource dg_ElementStyle}"  
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"                                                      
                                     Binding="{Binding id, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="分中心"   HeaderStyle="{StaticResource dg_HeaderStyle}" 
-                                    IsReadOnly="False" CanUserResize="False" Width="70"
+                <DataGridTextColumn Header="城市"   HeaderStyle="{StaticResource dg_HeaderStyle}" 
+                                    IsReadOnly="False" CanUserResize="False" Width="60"
                                     ElementStyle="{StaticResource dg_ElementStyle}"    
                                     EditingElementStyle="{StaticResource TextCellEditingElementStyle}"
                                     Binding="{Binding city, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTextColumn Header="台站"     HeaderStyle="{StaticResource dg_HeaderStyle}"   
-                                    IsReadOnly="False" CanUserResize="False"  Width="90"
+                                    IsReadOnly="False" CanUserResize="False"  Width="*"
                                     ElementStyle="{StaticResource dg_ElementStyle}"
                                     EditingElementStyle="{StaticResource TextCellEditingElementStyle}"     
                                     Binding="{Binding station, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="类型"     HeaderStyle="{StaticResource dg_HeaderStyle}"   
+                                    IsReadOnly="False" CanUserResize="False"  Width="50"
+                                    ElementStyle="{StaticResource dg_ElementStyle}"
+                                    EditingElementStyle="{StaticResource TextCellEditingElementStyle}"     
+                                    Binding="{Binding category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="节目名称"     HeaderStyle="{StaticResource dg_HeaderStyle}"   
+                                    IsReadOnly="False" CanUserResize="False"  Width="100"
+                                    ElementStyle="{StaticResource dg_ElementStyle}"
+                                    EditingElementStyle="{StaticResource TextCellEditingElementStyle}"     
+                                    Binding="{Binding name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTextColumn Header="频率"     HeaderStyle="{StaticResource dg_HeaderStyle}"   
                                     IsReadOnly="False" CanUserResize="False" Width="150"
                                     ElementStyle="{StaticResource dg_ElementStyle}" 
                                     EditingElementStyle="{StaticResource TextCellEditingElementStyle}"                
                                     Binding="{Binding frequency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <DataGridTextColumn Header="停止播出" CanUserResize="False" Width="65"
-                                    ElementStyle="{StaticResource dg_ElementStyle}"   
+                <DataGridTextColumn Header="停止播出" CanUserResize="False" Width="70"
+                                    ElementStyle="{StaticResource dg_ElementStyle}"   HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"
                                     Binding="{Binding off_time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="开始播出" CanUserResize="False" Width="65" 
-                                    ElementStyle="{StaticResource dg_ElementStyle}"   
+                <DataGridTextColumn Header="开始播出" CanUserResize="False" Width="70" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}"   HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"
                                     Binding="{Binding on_time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="周三停播" CanUserResize="False" Width="65" 
-                                    ElementStyle="{StaticResource dg_ElementStyle}"  
+                <DataGridTextColumn Header="周三停播" CanUserResize="False" Width="70" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}"  HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"
                                     Binding="{Binding off_time_3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="周三播出" CanUserResize="False" Width="65" 
-                                    ElementStyle="{StaticResource dg_ElementStyle}"   
+                <DataGridTextColumn Header="周三播出" CanUserResize="False" Width="70" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}"   HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"
                                     Binding="{Binding on_time_3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <DataGridCheckBoxColumn Header="周二检修" CanUserResize="False"  Width="70" 
-                                    ElementStyle="{StaticResource TuesdayCheckBoxStyle}"  
+                                    ElementStyle="{StaticResource TuesdayCheckBoxStyle}"  HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CheckBoxEditingElementStyle}"
                                     Binding="{Binding stop_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="周二停播" CanUserResize="False" Width="65" 
+                <DataGridTextColumn Header="周二停播" CanUserResize="False" Width="70" HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     ElementStyle="{StaticResource dg_ElementStyle}" 
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}" 
                                     Binding="{Binding off_time_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="周二播出" CanUserResize="False" Width="65" 
+                <DataGridTextColumn Header="周二播出" CanUserResize="False" Width="70" HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     ElementStyle="{StaticResource dg_ElementStyle}"   
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"
                                     Binding="{Binding on_time_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
 
-                <DataGridCheckBoxColumn Header="最后周二检修" CanUserResize="False"  Width="100" 
-                                    ElementStyle="{StaticResource TuesdayCheckBoxStyle}"  
+                <DataGridCheckBoxColumn Header="最后周二检修" CanUserResize="False"  Width="*" 
+                                    ElementStyle="{StaticResource TuesdayCheckBoxStyle}"  HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CheckBoxEditingElementStyle}"
                                     Binding="{Binding stop_last_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="最后周二停播" CanUserResize="False" Width="100" 
-                                    ElementStyle="{StaticResource dg_ElementStyle}" 
+                <DataGridTextColumn Header="最后周二停播" CanUserResize="False" Width="*" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}" HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}" 
                                     Binding="{Binding off_time_last_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="最后周二播出" CanUserResize="False" Width="100" 
-                                    ElementStyle="{StaticResource dg_ElementStyle}"   
+                <DataGridTextColumn Header="最后周二播出" CanUserResize="False" Width="*" 
+                                    ElementStyle="{StaticResource dg_ElementStyle}"   HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"
                                     Binding="{Binding on_time_last_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </DataGrid.Columns>
@@ -180,7 +189,7 @@
                 Click="btnAdd_Click"  />
         <Button Content="删除" Height="23" HorizontalAlignment="Left" Margin="648,373,0,0" Name="btnDelete" VerticalAlignment="Top" Width="75" 
                 Click="btnDelete_Click" RenderTransformOrigin="2.848,0.687"  />
-        
+
         <Button Content="退出" Height="23" HorizontalAlignment="Left" Margin="738,373,0,0" Name="btnClosePopUp" VerticalAlignment="Top" Width="75" 
                 Click="btnClosePopUp_Click"  />
     </Grid>

@@ -8,34 +8,46 @@
         ResizeMode="NoResize"
         Name="ssWindow"
         Title="台站播出数据" 
-        Height="500" Width="250"
+        Height="500" Width="480"
         Icon="/BCstats;component/radio.ico"
-        Loaded="StationStatsWindow_Loaded"
-        >
+        Loaded="StationStatsWindow_Loaded">
 
 
     <Grid Margin="0,0,3.6,0.4"  Background="Transparent">
 
         <DataGrid Name="StationStats_dataGridStats" 
-                  Margin="10,10,74.6,45" 
+                  Margin="0,0,70.4,55"
                   FontSize="14"
-                  RowHeight="60"
+                  RowHeight="50"
+                  BorderBrush="Black"
+                  
                   
                   SelectionMode="Single"
                   AutoGenerateColumns="False" 
-                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-                                   
+                  HorizontalContentAlignment="Left" VerticalContentAlignment="Center" 
+                  ScrollViewer.CanContentScroll="False"
+                  
                   RowStyle="{StaticResource DataGridRowStyle_StationStats}"   
                   CellStyle="{StaticResource DataGridCellReadOnlyStyle}" >
 
             <DataGrid.Columns>
 
+                <DataGridTextColumn Header="类型"     HeaderStyle="{StaticResource dg_BigHeaderStyle}"   
+                                    IsReadOnly="True" CanUserResize="False" Width="*" 
+                                    Binding="{Binding category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    ElementStyle="{StaticResource dg_ElementStyle}"/>
+                <DataGridTextColumn Header="名称"     HeaderStyle="{StaticResource dg_BigHeaderStyle}"   
+                                    IsReadOnly="True" CanUserResize="False" Width="100" 
+                                    Binding="{Binding name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    ElementStyle="{StaticResource dg_ElementStyle}"/>
+
                 <DataGridTextColumn Header="频率"     HeaderStyle="{StaticResource dg_BigHeaderStyle}"   
-                                    IsReadOnly="True" CanUserResize="False" Width="60" 
+                                    IsReadOnly="True" CanUserResize="False" Width="100" 
                                     Binding="{Binding frequency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                     ElementStyle="{StaticResource dg_ElementStyle}"/>
 
-                <DataGridTextColumn Header="当月播出时间" CanUserResize="False" Width="100" IsReadOnly="True"
+                <DataGridTextColumn Header="当月播出时间" HeaderStyle="{StaticResource dg_BigHeaderStyle}" 
+                                    IsReadOnly="True" CanUserResize="False" Width="100" 
                                     Binding="{Binding hours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                     ElementStyle="{StaticResource dg_ElementStyle}"/>
             </DataGrid.Columns>
@@ -43,46 +55,55 @@
 
 
 
-        <DataGrid Name="StationStats_dataGridFm" 
-                  Margin="170,10,8.6,379" 
-                  FontSize="14"
-                  RowHeight="35"
-                  AutoGenerateColumns="False" 
-                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"           
-                  RowStyle="{StaticResource DataGridRowStyle}"   
-                  SelectionMode="Single" >
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="调频"     HeaderStyle="{StaticResource dg_HeaderStyle}"   
-                                    IsReadOnly="False" CanUserResize="False" Width="50"
-                                    ElementStyle="{StaticResource dg_ElementStyle}" />
-            </DataGrid.Columns>
-        </DataGrid>
 
 
 
-        <DataGrid Name="StationStats_dataGridTv" 
-                  Margin="170,100,6.6,289" 
-                  FontSize="14"
-                  RowHeight="35"
-                  AutoGenerateColumns="False" 
-                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"           
-                  RowStyle="{StaticResource DataGridRowStyle}"   
-                  SelectionMode="Single" >
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="电视"     HeaderStyle="{StaticResource dg_HeaderStyle}"   
-                                    IsReadOnly="False" CanUserResize="False" Width="50"
-                                    ElementStyle="{StaticResource dg_ElementStyle}" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <Button x:Name="btn_ss_refresh" Height="30" Content="刷新" FontSize="16" HorizontalAlignment="Left" Margin="10,440,0,0" VerticalAlignment="Top" Width="75" Click="btn_ss_refresh_Click"/>
+        <Button x:Name="btn_ss_quit" Height="30" Content="关闭" FontSize="16" HorizontalAlignment="Left" Margin="194,440,0,0" VerticalAlignment="Top" Width="75" 
+                Click="btn_ss_quit_Click"/>
 
+        <Label x:Name="lblSW" Content="短波" Margin="400,9,0,0" Height="40" Width="60"
+            FontSize="16"
+            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+            HorizontalAlignment="Left"  VerticalAlignment="Top" />
+        <Label x:Name="lblMW" Content="中波" Margin="400,79,0,0" Height="40" Width="60"
+            FontSize="16"
+            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+            HorizontalAlignment="Left"  VerticalAlignment="Top" />
+        <Label x:Name="lblFM" Content="调频" Margin="400,161,0,0" Height="40" Width="60"
+            FontSize="16"
+            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+            HorizontalAlignment="Left"  VerticalAlignment="Top" />
+        <Label x:Name="lblDTV" Content="电视" Margin="400,239,0,0" Height="40" Width="60"
+            FontSize="16"
+            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+            HorizontalAlignment="Left"  VerticalAlignment="Top" />
+        <Label x:Name="lblAllHours" Content="总计" Margin="400,321,0,0" Height="40" Width="60"
+            FontSize="16"
+            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+            HorizontalAlignment="Left"  VerticalAlignment="Top" RenderTransformOrigin="0.47,-0.325" />
 
+        <TextBox x:Name="tbxSW" Width="60" Height="30" IsReadOnly="True" BorderThickness="0" FontSize="16"
+                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                 HorizontalAlignment="Left"  Margin="400,50,0,0" 
+                 TextWrapping="Wrap" Text="" VerticalAlignment="Top" />
+        <TextBox x:Name="tbxMW" Width="60" Height="30" IsReadOnly="True" BorderThickness="0" FontSize="16"
+                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                 HorizontalAlignment="Left"  Margin="400,126,0,0" 
+                 TextWrapping="Wrap" Text="" VerticalAlignment="Top" />
+        <TextBox x:Name="tbxFM" Width="60" Height="30" IsReadOnly="True" BorderThickness="0" FontSize="16"
+                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                 HorizontalAlignment="Left"  Margin="400,206,0,0" 
+                 TextWrapping="Wrap" Text="" VerticalAlignment="Top" />
+        <TextBox x:Name="tbxDTV" Width="60" Height="30" IsReadOnly="True" BorderThickness="0" FontSize="16"
+                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                 HorizontalAlignment="Left"  Margin="400,286,0,0" 
+                 TextWrapping="Wrap" Text="" VerticalAlignment="Top" />
 
-
-
-        <Button x:Name="btn_ss_refresh" Content="刷新" HorizontalAlignment="Left" Margin="10,441,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="btn_ss_quit" Content="退出" HorizontalAlignment="Left" Margin="155,441,0,0" VerticalAlignment="Top" Width="75" Click="btn_ss_quit_Click"/>
-
-
+        <TextBox x:Name="tbxAllHours" Width="60" Height="30" IsReadOnly="True" BorderThickness="0" FontSize="16"
+            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+            HorizontalAlignment="Left"  Margin="400,366,0,0" 
+            TextWrapping="Wrap" Text="" VerticalAlignment="Top" RenderTransformOrigin="0.537,-0.273" />
 
     </Grid>
 

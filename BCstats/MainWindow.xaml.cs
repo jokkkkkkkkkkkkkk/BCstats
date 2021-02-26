@@ -4,10 +4,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Text.RegularExpressions;     //System.Windows.Threading.DispatcherTimer
+using System.Text.RegularExpressions;     // System.Windows.Threading.DispatcherTimer
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
-using System.Data;
+
 
 namespace BCstats {
     /// <summary>
@@ -16,17 +16,31 @@ namespace BCstats {
     public partial class MainWindow : Window {
 
         #region SQLite 常量定义
-        BCstatsHelper bcHelper = new BCstatsHelper();
         SQLiteHelper sqliteHelper = new SQLiteHelper(BCstatsHelper.connectionString);
         #endregion
 
+        #region
+        public static MainWindow instance;
+        public static double mwLeft, mwTop;
+        #endregion
 
         public MainWindow() {
             InitializeComponent();
+            // 用于子窗口根秀主窗口移动
+            instance = this;
+        }
+
+
+        #region 主窗口 事件
+        /// <summary>
+        /// 主窗口：初始化控件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mWindow_Loaded(object sender, RoutedEventArgs e) {
             // 初始化
             try {
-                // 默认打开的TabItem
-                // 3：台站播出统计
+                // 默认打开的TabItem： 3 台站播出统计
                 tabControl1.SelectedIndex = 3;
 
                 #region 显示系统当前时间
@@ -46,10 +60,10 @@ namespace BCstats {
                 #endregion
 
                 // 台站播出统计：读取city字段
-                getComboBoxBinding(cboxCity, sqliteHelper, BCstatsHelper.connectionString, 
+                getComboBoxBinding(cboxCity, sqliteHelper, BCstatsHelper.connectionString,
                     BCstatsHelper.STR_CITY, null, null, "InitializeComponent");
                 // 月播出时间统计：读取city字段
-                getComboBoxBinding(cbx_city, sqliteHelper, BCstatsHelper.connectionString, 
+                getComboBoxBinding(cbx_city, sqliteHelper, BCstatsHelper.connectionString,
                     BCstatsHelper.STR_CITY, null, null, "InitializeComponent");
 
 
@@ -64,9 +78,9 @@ namespace BCstats {
                 // 滚动条的最大值：几个周二/周三不停机检修
                 int intYear = Convert.ToInt32(scbYear.Value);
                 int intMonth = Convert.ToInt32(scbMonth.Value);
-                scbNoStop2.Maximum = 
+                scbNoStop2.Maximum =
                     BCstatsHelper.DayOfWeekConutOfTheMonth(intYear, intMonth, DayOfWeek.Tuesday);
-                scbNoStop3.Maximum = 
+                scbNoStop3.Maximum =
                     BCstatsHelper.DayOfWeekConutOfTheMonth(intYear, intMonth, DayOfWeek.Wednesday);
                 // 滚动条：初始化，显示的值
                 scbNoStop2.Value = 0;
@@ -85,9 +99,9 @@ namespace BCstats {
                 // 周二 / 周三的数量：有几个周二 / 周三
                 // 本月1日 - 本月30/31日
                 // 滚动条的最大值：几个周二/周三不停机检修
-                scb_NoStop2.Maximum = 
+                scb_NoStop2.Maximum =
                     BCstatsHelper.DayOfWeekConutOfTheMonth(int_Year, int_Month, DayOfWeek.Tuesday);
-                scb_NoStop3.Maximum = 
+                scb_NoStop3.Maximum =
                     BCstatsHelper.DayOfWeekConutOfTheMonth(int_Year, int_Month, DayOfWeek.Wednesday);
 
                 // 滚动条：初始化，显示的值
@@ -96,13 +110,27 @@ namespace BCstats {
 
                 #endregion
 
-                //MessageBox.Show(BCstatsHelper.connectionString);
 
-            } catch (Exception e) {
-                MessageBox.Show(e.ToString());
+            } catch (Exception ex) {
+                MessageBox.Show(ex.ToString());
+            }
+
+            mwLeft = this.Left;
+            mwTop = this.Top;
+        }
+        /// <summary>
+        /// 子窗口位置跟随主窗口位置改变而改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mWindow_LocationChanged(object sender, EventArgs e) {
+            foreach (Window win in this.OwnedWindows) {
+                win.Top = this.Top + (this.Height - win.ActualHeight) / 2;
+                win.Left = this.Left + this.Width;
             }
         }
 
+        #endregion
 
 
         /// <summary>
@@ -126,10 +154,19 @@ namespace BCstats {
 
                 List<string> columnValueList = null;
                 //MessageBox.Show(sql);
-                // 获取数据表中某一列的所有不重复的值
-                columnValueList = sqliteHelper.GetColunmValues(connectionString, 
-                    columnName,
-                    whereName, whereValue);
+                // 城市、台站，有重复
+                if(columnName == BCstatsHelper.STR_CITY || columnName == BCstatsHelper.STR_STATION) {
+                    // 获取数据表中某一列的所有不重复的值
+                    columnValueList = sqliteHelper.GetColunmDistinctValues(connectionString,
+                        columnName,
+                        whereName, whereValue);
+                } else {
+                    // 获取数据表中某一列所有的值
+                    columnValueList = sqliteHelper.GetColunmValues(connectionString,
+                        columnName,
+                        whereName, whereValue);
+                }
+
                 for (int i = 0; i < columnValueList.Count; i++) {
                     cbox.Items.Add(columnValueList[i]);
                 }
@@ -159,9 +196,65 @@ namespace BCstats {
         /// <param name="e"></param>
         private void btnPopup_TimeTable_Click(object sender, RoutedEventArgs e) {
             // 保持弹出窗口在主窗口前
-            var popup = new TimeTableWindow(windows1);
+            var popup = new TimeTableWindow(mWindow);
             popup.ShowDialog();
         }
+
+        /// <summary>
+        /// 台站播出统计：按钮 弹出窗口，台站播出统计
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnPopUp_StationStats_Click(object sender, RoutedEventArgs e) {
+            int windowsCount = Application.Current.Windows.Count;
+            try {
+                // 未打开子窗口
+                if (windowsCount == 2) {
+                    this.Left = mwLeft;
+                    this.Top = mwTop;
+                    // 打开子窗口
+                    var ssw = new StationStatsWindow(mWindow);
+                    // 子窗口的起始位置：紧贴在主窗口右侧
+                    ssw.Height = this.Height;
+                    ssw.WindowStartupLocation = WindowStartupLocation.Manual;
+                    ssw.Left = mwLeft + this.Width;
+                    ssw.Top = mwTop + (this.Height - ssw.Height) / 2;
+                    ssw.Title = cboxStation.Text + " "
+                        + scbYear.Value.ToString() + "年"
+                        + scbMonth.Value.ToString() + "月"
+                        + "播出统计";
+                    ssw.Show();
+                    // 主窗口的位置：往左移，让软件的整个界面位置接近屏幕中央
+                    this.Left = this.Left - ssw.Width + 100;
+                    this.Top = mwTop;
+                } else {
+                    // 已打开子窗口，则刷新子窗口数据
+                    foreach (Window window in Application.Current.Windows) {
+                        StationStatsWindow sw = Application.Current.Windows[2] as StationStatsWindow;
+                        sw.StationStatsWindow_Loaded(sender, e);
+                    }
+                }
+            } catch {
+                ;
+            }
+        }
+
+
+        /// <summary>
+        /// 刷新子窗口数据：台站播出时长统计
+        /// </summary>
+        private void RefreshStationStatsWindow() {
+            if (Application.Current.Windows.Count == 4) {
+                StationStatsWindow sw = Application.Current.Windows[2] as StationStatsWindow;
+                sw.GetStationBCHours();
+            }
+        }
+
+
+
+
+
+
 
         /// <summary>
         /// 按钮 通用，退出程序
@@ -212,6 +305,9 @@ namespace BCstats {
                 BCstatsHelper.STR_FREQUENCY,
                 BCstatsHelper.STR_STATION, cboxStation.Text,
                 "cboxStation_DropDownClosed");
+            Hours.Text = string.Empty;
+            // 刷新子窗口数据
+            this.RefreshStationStatsWindow();
         }
 
         /// <summary>
@@ -305,7 +401,7 @@ namespace BCstats {
                     on_time_last_2_min = Convert.ToDouble(on_time_last_2.Substring(2, 2));
 
 
-                    // 当月播出总小时
+                    // 当月播出总时长
                     Hours.Text = BCstatsHelper.TotalHoursOfTheMonth(
                                                    year, month,
                                                    Convert.ToInt32(scbNoStop2.Value),
@@ -339,7 +435,8 @@ namespace BCstats {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void tabItem3_ScrollBar_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e) {
+        private void tabItem3_ScrollBar_Scroll(object sender, 
+            System.Windows.Controls.Primitives.ScrollEventArgs e) {
             cboxFrequency_DropDownClosed(sender, e);
         }
 
@@ -365,6 +462,8 @@ namespace BCstats {
                 && cboxStation.SelectedIndex != -1
                 && cboxFrequency.SelectedIndex != -1) {
                 cboxFrequency_DropDownClosed(sender, e);
+                // 刷新子窗口数据
+                this.RefreshStationStatsWindow();
             }
         }
         /// <summary>
@@ -390,6 +489,8 @@ namespace BCstats {
                 && cboxStation.SelectedIndex != -1
                 && cboxFrequency.SelectedIndex != -1) {
                 cboxFrequency_DropDownClosed(sender, e);
+                // 刷新子窗口数据
+                this.RefreshStationStatsWindow();
             }
         }
 
@@ -595,7 +696,7 @@ namespace BCstats {
                     nonStop3 = Convert.ToInt16(scb_NoStop3.Value);
                 }
 
-                // 当月播出总小时
+                // 当月播出总时长
                 tbxTotalHours.Text = BCstatsHelper.TotalHoursOfTheMonth(
                                                    year, month,
                                                    nonStop2, nonStop3,
@@ -1111,7 +1212,7 @@ namespace BCstats {
         #endregion
 
 
-        #region 通用函数
+        #region 通用事件
         /// <summary>
         /// isNumberic：判断是否是数字的子函数
         /// </summary> isDigit：是否是数字
@@ -1205,162 +1306,10 @@ namespace BCstats {
             }
         }
 
-
         #endregion
-
-        /// <summary>
-        /// 台站播出统计：按钮 弹出窗口，台站播出数据
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnPopUp_StationStats_Click(object sender, RoutedEventArgs e) {
-            DataTable dt = new DataTable();
-            if (cboxCity.SelectedIndex != -1 
-                && cboxStation.SelectedIndex != -1
-                && cboxFrequency.SelectedIndex != -1) {
-
-                int year = Convert.ToInt32(scbYear.Value);
-                int month = Convert.ToInt32(scbMonth.Value);
-                string city = cboxCity.Text;
-                string station = cboxStation.Text;
-
-                List<string> list = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString,
-                    BCstatsHelper.STR_FREQUENCY,
-                    BCstatsHelper.STR_STATION, cboxStation.Text);
-
-                dt.Columns.Add("frequency");
-                dt.Columns.Add("hours");
-
-                for (int i = 0; i < list.Count; i++) {
-                    DataRow dr = dt.NewRow();
-                    dr["frequency"] = list[i];
-                    dr["hours"] = GetFrequencyHours(year, month, city, station, list[i]);
-                    dt.Rows.Add(dr);
-                }
-
-            }
-            Console.WriteLine("mw - d.Rows.Count: " + dt.Rows.Count);
-
-            var ssw = new StationStatsWindow(windows1, dt);
-            // 子窗口的位置：紧贴在主窗口右侧
-            ssw.Height = this.Height;
-            ssw.WindowStartupLocation = WindowStartupLocation.Manual;
-            ssw.Left = this.Left + this.Width;
-            ssw.Top = this.Top + (this.Height - ssw.Height) / 2;
-            ssw.Show();
-        }
-
-
-
-
-
-
-
-        private string GetFrequencyHours(int year, int month,
-            string city, string station, string frequency) {
-            try {
-                double off_time_hour, off_time_min, on_time_hour, on_time_min;
-                bool stop2, stopLast2;
-                double off_time_2_hour, off_time_2_min, 
-                    on_time_2_hour, on_time_2_min;
-                double off_time_last_2_hour, off_time_last_2_min, 
-                    on_time_last_2_hour, on_time_last_2_min;
-                double off_time_3_hour, off_time_3_min, 
-                    on_time_3_hour, on_time_3_min;
-
-                // 停止播出
-                string off_time = sqliteHelper.GetTimeValue(city, station,
-                    frequency, BCstatsHelper.STR_OFF_TIME);
-                off_time_hour = Convert.ToDouble(off_time.Substring(0, 2));
-                off_time_min = Convert.ToDouble(off_time.Substring(2, 2));
-
-                // 开始播出
-                string on_time = sqliteHelper.GetTimeValue(city, station,
-                    frequency, BCstatsHelper.STR_ON_TIME);
-                on_time_hour = Convert.ToDouble(on_time.Substring(0, 2));
-                on_time_min = Convert.ToDouble(on_time.Substring(2, 2));
-
-                // 周三停播
-                string off_time_3 = sqliteHelper.GetTimeValue(city, station,
-                    frequency, BCstatsHelper.STR_OFF_TIME_3);
-                off_time_3_hour = Convert.ToDouble(off_time_3.Substring(0, 2));
-                off_time_3_min = Convert.ToDouble(off_time_3.Substring(2, 2));
-                // 周三播出
-                string on_time_3 = sqliteHelper.GetTimeValue(city, station,
-                    frequency, BCstatsHelper.STR_ON_TIME_3);
-                on_time_3_hour = Convert.ToDouble(on_time_3.Substring(0, 2));
-                on_time_3_min = Convert.ToDouble(on_time_3.Substring(2, 2));
-
-                // 周二是否停机检修
-                int stop_2 = sqliteHelper.GetIntValue(city, station,
-                    frequency, BCstatsHelper.STR_STOP_2);
-                if (stop_2 == 1)
-                    stop2 = true;
-                else stop2 = false;
-                // 周二停播
-                string off_time_2 = sqliteHelper.GetTimeValue(city, station,
-                    frequency, BCstatsHelper.STR_OFF_TIME_2);
-                off_time_2_hour = Convert.ToDouble(off_time_2.Substring(0, 2));
-                off_time_2_min = Convert.ToDouble(off_time_2.Substring(2, 2));
-                // 周二播出
-                string on_time_2 = sqliteHelper.GetTimeValue(city, station,
-                    frequency, BCstatsHelper.STR_ON_TIME_2);
-                on_time_2_hour = Convert.ToDouble(on_time_2.Substring(0, 2));
-                on_time_2_min = Convert.ToDouble(on_time_2.Substring(2, 2));
-
-                // 最后一个周二是否停机检修
-                int stop_last_2 = sqliteHelper.GetIntValue(city, station,
-                    frequency, BCstatsHelper.STR_STOP_LAST_2);
-                if (stop_last_2 == 1) {
-                    stopLast2 = true;
-                    rbtnLastTuesday.IsChecked = true;
-                    // 最后一个周二停机检修
-                } else {
-                    stopLast2 = false;
-                    rbtnLastTuesday.IsChecked = false;
-                    // 最后一个周二不停机检修
-                }
-
-                // 最后一个周二停播
-                string off_time_last_2 = sqliteHelper.GetTimeValue(city, station,
-                    frequency, BCstatsHelper.STR_OFF_TIME_LAST_2);
-                off_time_last_2_hour = Convert.ToDouble(off_time_last_2.Substring(0, 2));
-                off_time_last_2_min = Convert.ToDouble(off_time_last_2.Substring(2, 2));
-                // 最后一个周二播出
-                string on_time_last_2 = sqliteHelper.GetTimeValue(city, station,
-                    frequency, BCstatsHelper.STR_ON_TIME_LAST_2);
-                on_time_last_2_hour = Convert.ToDouble(on_time_last_2.Substring(0, 2));
-                on_time_last_2_min = Convert.ToDouble(on_time_last_2.Substring(2, 2));
-
-                // 当月播出总小时
-                return BCstatsHelper.TotalHoursOfTheMonth(
-                                                year, month,
-                                                Convert.ToInt32(scbNoStop2.Value),
-                                                Convert.ToInt32(scbNoStop3.Value),
-                                                off_time_hour, off_time_min,
-                                                on_time_hour, on_time_min,
-                                                stop2,
-                                                off_time_2_hour, off_time_2_min,
-                                                on_time_2_hour, on_time_2_min,
-                                                stopLast2,
-                                                off_time_last_2_hour, off_time_last_2_min,
-                                                on_time_last_2_hour, on_time_last_2_min,
-                                                off_time_3_hour, off_time_3_min,
-                                                on_time_3_hour, on_time_3_min)
-                                                .ToString();
-            } catch {
-                return "0";
-            }
-        }
-
-
-
-
 
 
 
     }
-
-
-
+   
 }

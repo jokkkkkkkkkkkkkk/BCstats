@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Data;
+using System.Data.SQLite;
 using System.IO;
 using System.Windows;
 
@@ -12,20 +13,24 @@ public sealed class BCstatsHelper {
     /// </summary>
     public static string connectionString = "data source = "
         + Environment.CurrentDirectory
-        + "/bcstats.db";
+        + "\\bcstats.db";
     #endregion
 
-    #region 数据库字段名称常量
+    #region SQLite数据库相关常量
+    SQLiteHelper sqliteHelper = new SQLiteHelper(connectionString);
+
     public const string tableName = "freqs";
 
     public const string STR_ID = "id";
     public const string STR_CITY = "city";
     public const string STR_STATION = "station";
+    public const string STR_CATEGORY = "category";
+    public const string STR_NAME = "name";
     public const string STR_FREQUENCY = "frequency";
 
     public const string STR_CITY_CH = "分中心";
-    public const string STR_STATION_CH = "台";
-    public const string STR_FREQUENCY_CH = "HZ";
+    public const string STR_STATION_CH = "台站";
+    public const string STR_FREQUENCY_CH = "Hz";
 
     public const string STR_OFF_TIME = "off_time";
     public const string STR_ON_TIME = "on_time";
@@ -38,6 +43,14 @@ public sealed class BCstatsHelper {
     public const string STR_OFF_TIME_LAST_2 = "off_time_last_2";
     public const string STR_ON_TIME_LAST_2 = "on_time_last_2";
 
+    public const string STR_HOURS = "hours";
+
+    #endregion
+
+    #region 其他常量
+    public const string STR_MainWindow_NAME = "mWindow";
+    public const string STR_StationStatsWindow_TITLE = "台站播出数据";
+    public const string STR_StationStatsWindow_NAME = "ssWindow";
 
     #endregion
 
@@ -322,8 +335,38 @@ public sealed class BCstatsHelper {
     }
 
 
-
-
+    /// <summary>
+    /// 获取指定频率的某个时间的整型值
+    /// </summary>
+    /// <param name="city"></param>
+    /// <param name="station"></param>
+    /// <param name="frequency"></param>
+    /// <param name="timeName"></param>
+    /// <returns>int</returns>
+    public int GetIntValue(string city, string station, string frequency, string timeName) {
+        try {
+            string sql =
+                string.Format("SELECT {0} FROM {1} WHERE {2}='{3}' AND {4}='{5}' AND {6}='{7}'",
+                timeName, tableName, 
+                STR_CITY, city, 
+                STR_STATION, station, 
+                STR_FREQUENCY, frequency);
+            SQLiteDataReader reader = sqliteHelper.ExecuteQuery(sql);
+            int value = 0;
+            if (reader.HasRows) {
+                while (reader.Read()) {
+                    value = reader.GetInt16(0);
+                }
+            } else {
+                return 0;
+            }
+            return value;
+        } catch (Exception ex) {
+            return 0;
+        } finally {
+            SQLiteHelper.closeConn();
+        }
+    }
 
     /// <summary>
     /// 获取DataTable的所有列的列名称
@@ -353,9 +396,6 @@ public sealed class BCstatsHelper {
         }
         return arr;
     }
-
-
-
 
 }
 
