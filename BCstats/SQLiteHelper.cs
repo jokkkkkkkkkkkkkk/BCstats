@@ -290,7 +290,7 @@ class SQLiteHelper {
     public  string GetTimeValue(string city, string station, string frequency, string fieldName) {
         try {
             string sql = 
-                string.Format("select {0} from freqs where city='{1}' and station='{2}' and frequency='{3}'", 
+                string.Format("SELECT {0} FROM freqs where city='{1}' and station='{2}' and frequency='{3}'", 
                 fieldName, city, station, frequency);
             //MessageBox.Show("GetTimeValue sql: " + sql);
             SQLiteDataReader reader = ExecuteQuery(sql);
@@ -302,7 +302,6 @@ class SQLiteHelper {
             } else {
                 return null;
             }
-
             return value;
         } catch (Exception ex) {
             return ex.ToString();
@@ -322,7 +321,7 @@ class SQLiteHelper {
     public int GetIntValue(string city, string station, string frequency, string fieldName) {
         try {
             string sql =
-                string.Format("select {0} from freqs where city='{1}' and station='{2}' and frequency='{3}'",
+                string.Format("SELECT {0} FROM freqs where city='{1}' and station='{2}' and frequency='{3}'",
                 fieldName, city, station, frequency);
             //MessageBox.Show("GetIntValue sql: " + sql);
             SQLiteDataReader reader = ExecuteQuery(sql);
@@ -337,7 +336,6 @@ class SQLiteHelper {
             return value;
         } catch (Exception ex) {
             return 0;
-            MessageBox.Show(ex.ToString());
         } finally {
             closeConn();
         }
@@ -345,7 +343,7 @@ class SQLiteHelper {
 
 
     /// <summary>
-    /// 获取数据表中某一列的所有不重复的值
+    /// 获取数据表中某一列所有的值
     /// </summary>
     /// <param name="connectionString"></param>
     /// <param name="columnName"></param>
@@ -358,14 +356,38 @@ class SQLiteHelper {
         try {
             string sql;
             if (whereName != null && whereValue != null) {
+                sql = string.Format("SELECT {0} FROM {1} WHERE {2}='{3}'",
+                    columnName, BCstatsHelper.tableName,
+                    whereName, whereValue);
+            } else {
+                sql = string.Format("SELECT {0} FROM {1}", columnName, BCstatsHelper.tableName);
+            }
+            return GetColmn(connectionString, sql);
+        } catch {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 获取数据表中某一列所有不重复的值
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <param name="columnName"></param>
+    /// <param name="whereName"></param>
+    /// <param name="whereValue"></param>
+    /// <returns></returns>
+    public List<string> GetColunmDistinctValues(string connectionString,
+                                string columnName,
+                                string whereName, string whereValue) {
+        try {
+            string sql;
+            if (whereName != null && whereValue != null) {
                 sql = string.Format("SELECT DISTINCT {0} FROM {1} WHERE {2}='{3}'",
                     columnName, BCstatsHelper.tableName,
                     whereName, whereValue);
             } else {
                 sql = string.Format("SELECT DISTINCT {0} FROM {1}", columnName, BCstatsHelper.tableName);
             }
-            //MessageBox.Show(sql);
-            // 获取数据表中某一列的所有不重复的值
             return GetColmn(connectionString, sql);
         } catch {
             return null;
@@ -374,7 +396,32 @@ class SQLiteHelper {
 
 
 
+    /// <summary>
+    /// 获取数据表中某一种数据的数量
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <param name="whereName"></param>
+    /// <param name="whereValue"></param>
+    /// <returns></returns>
+    public int GetDataCount(string connectionString,
+                                string whereName, string whereValue) {
+        try {
+            string sql;
+            if (whereName != null && whereValue != null) {
+                sql = string.Format("SELECT COUNT(*) FROM {0} WHERE {1}='{2}'",
+                    BCstatsHelper.tableName,
+                    whereName, whereValue);
+            } else {
+                sql = string.Format("SELECT COUNT(*) FROM {1}", BCstatsHelper.tableName);
+            }
+            return Convert.ToInt16(ExecuteScalar(connectionString, sql));
+        } catch {
+            return 0;
+        }
 
+
+
+    }
 
 
     private static SQLiteConnection m_dbConnection;
@@ -407,6 +454,22 @@ class SQLiteHelper {
     }
 
 
+
+    /// <summary>
+    /// 打印数组ArrayList
+    /// </summary>
+    /// <param name="arr"></param>
+    public void PrintArray(ArrayList arr) {
+        string str = "[";
+        for (int i = 0; i < arr.Count; i++) {
+            str += arr[i].ToString();
+            if (i != arr.Count - 1) {
+                str += ',';
+            }
+        }
+        str += "]";
+        Console.WriteLine(str);
+    }
 
 
     /// <summary>
