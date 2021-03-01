@@ -2,23 +2,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:c="clr-namespace:BCstats" 
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-              
+        xmlns:assembly="clr-namespace:System;assembly=mscorlib"   
+        xmlns:local="clr-namespace:BCstats" 
+        
         x:Name="mWindow" 
         x:Class="BCstats.MainWindow"
         
-        Title="传输播出统计"   
+        Title="传输播出统计工具"   
         Icon="radio.ico"
-        
         FontSize="15" FontStyle="Normal" FontWeight="Normal" 
         Visibility="Visible" WindowStartupLocation="CenterScreen" 
-        Height="500" Width="640" MinHeight="520" 
+        Height="520" Width="640"
         IsEnabled="True" ResizeMode="CanMinimize"
         Loaded="mWindow_Loaded"
-        LocationChanged="mWindow_LocationChanged"
-        >
+        LocationChanged="mWindow_LocationChanged">
 
     <Window.Resources>
-
         <Style x:Key="MySimpleScrollBar" 
                TargetType="{x:Type ScrollBar}">
 
@@ -168,14 +167,30 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!--timeBox_TextBoxStyle
+        停播率统计：timeBox的文本框样式
+        -->
+        <Style x:Key="timeBox_TextBoxStyle"
+               TargetType="{x:Type TextBox}">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="35" />
+            <Setter Property="IsReadOnly" Value="False" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Text" Value="00 : 00 : 00" />
+            <Setter Property="MaxLength" Value="6" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
 
+            <EventSetter Event="TextBox.PreviewTextInput" Handler="PreviewTextinput"/>
+            <EventSetter Event="TextBox.TextChanged" Handler="timebox_TextChanged"/>
+            <EventSetter Event="TextBox.GotFocus" Handler="timebox_GotFocus"/>
+            <EventSetter Event="TextBox.LostFocus" Handler="timebox_LostFocus"/>
+            <EventSetter Event="TextBox.PreviewMouseDown" Handler="timebox_PreviewMouseDown"/>
+            <EventSetter Event="TextBox.PreviewKeyDown" Handler="timebox_PreviewKeyDown"/>
+        </Style>
     </Window.Resources>
-    <!--c:
-    数据源绑定到的方法名
-    x:Key= 关键字
-    -->
-
-
 
 
     <TabControl Height="462" HorizontalAlignment="Left" Margin="0,30,0,0" Name="tabControl1" VerticalAlignment="Top" Width="628">
@@ -253,7 +268,7 @@
                        HorizontalAlignment="Left" Margin="155,72,0,0" Name="label12" VerticalAlignment="Top" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                 <Label Content="节目频率" FontSize="18" HorizontalContentAlignment="Center" Width="250"
                        HorizontalAlignment="Left" Margin="330,72,0,0" Name="label15" VerticalAlignment="Top" VerticalContentAlignment="Center" />
-                <Label Content="系统时间" Height="30" HorizontalAlignment="Left" Margin="286,384,0,0" Name="lblNow3" VerticalAlignment="Top" Width="160" />
+                <Label Content="系统时间" Height="30" HorizontalAlignment="Left" Margin="286,384,0,0" Name="lblNow3" VerticalAlignment="Top" Width="200" />
                 <Label Content="共几个周二不停机检修" FontSize="18" Height="30" HorizontalAlignment="Left" Margin="29,164,0,0" Name="label16" VerticalAlignment="Top" Width="190" />
                 <Label Content="共几个周三不停机检修" FontSize="18" Height="30" HorizontalAlignment="Left" Margin="29,209,0,0" Name="label19" VerticalAlignment="Top" Width="190" />
 
@@ -275,7 +290,7 @@
                        FontSize="20"  Width="210" Height="40"
                        HorizontalAlignment="Left" Margin="285,182,0,0" VerticalAlignment="Top"
                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                
+
                 <Button x:Name="btnPopUp_StationStats" Content="台站当月播出时长"  Width="160" Height="50"
                         FontSize="18" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         HorizontalAlignment="Left" Margin="420,310,0,0" VerticalAlignment="Top" 
@@ -287,47 +302,37 @@
 
         <!--停播率统计-->
         <TabItem Header="停播率统计" Name="tabItem2">
-            <Grid Name="grid2" Height="425" Width="620"
-                   HorizontalAlignment="Left" 
-                  Margin="0,0,0,0"  VerticalAlignment="Top"  
-                  DataContext="{Binding}"
-                  Visibility="Visible" >
+            <Grid Name="grid2" Height="425" Width="620" 
+                  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0">
 
+                <Label Content="各停止播出时长" FontSize="18" Height="35" Margin="24,39,0,0" Name="label30"
+                       HorizontalAlignment="Left"  VerticalAlignment="Top" 
+                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.ColumnSpan="2" />
+                <TextBox x:Name="timebox1" Margin="50,78,0,0"  Style="{StaticResource timeBox_TextBoxStyle}" />
+                <TextBox Margin="50,118,0,0" x:Name="timebox2" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="50,157,0,0" x:Name="timebox3" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="50,196,0,0" x:Name="timebox4" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="50,235,0,0" x:Name="timebox5" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="181,78,0,0" x:Name="timebox6" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="181,118,0,0" x:Name="timebox7" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="181,157,0,0" x:Name="timebox8" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="181,196,0,0" x:Name="timebox9" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="181,235,0,0" x:Name="timebox10" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="320,78,0,0" x:Name="timebox11" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="320,118,0,0" x:Name="timebox12" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="320,157,0,0" x:Name="timebox13" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="320,196,0,0" x:Name="timebox14" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="320,235,0,0" Name="timebox15" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="461,78,0,0" x:Name="timebox16" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="461,118,0,0" x:Name="timebox17" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="461,157,0,0" x:Name="timebox18" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="461,196,0,0" x:Name="timebox19" Style="{StaticResource timeBox_TextBoxStyle}"/>
+                <TextBox Margin="461,235,0,0" x:Name="timebox20" Style="{StaticResource timeBox_TextBoxStyle}"/>
 
-                <Label Content="各停止播出时长" FontSize="18" Height="35" HorizontalAlignment="Left" Margin="24,39,0,0" Name="label30" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.ColumnSpan="2" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="50,78,0,0" Name="timebox1" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MaxLength="6" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="50,118,0,0" Name="timebox2" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="50,157,0,0" Name="timebox3" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="50,196,0,0" Name="timebox4" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="50,235,0,0" Name="timebox5" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="181,78,0,0" Name="timebox6" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="181,118,0,0" Name="timebox7" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="181,157,0,0" Name="timebox8" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="181,196,0,0" Name="timebox9" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="181,235,0,0" Name="timebox10" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="320,78,0,0" Name="timebox11" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="320,118,0,0" Name="timebox12" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="320,157,0,0" Name="timebox13" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="320,196,0,0" Name="timebox14" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="320,235,0,0" Name="timebox15" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="461,78,0,0" Name="timebox16" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="461,118,0,0" Name="timebox17" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="461,157,0,0" Name="timebox18" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="461,196,0,0" Name="timebox19" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-                <TextBox Height="35" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="461,235,0,0" Name="timebox20" Text="00 : 00 : 00" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="100" MinHeight="35" MaxHeight="35" MinWidth="100" MaxWidth="100" TextAlignment="Center" IsEnabled="True" MaxLength="6" PreviewTextInput="PreviewTextinput" TextChanged="timebox_TextChanged" GotFocus="timebox_GotFocus" LostFocus="timebox_LostFocus" PreviewMouseDown="timebox_PreviewMouseDown" PreviewKeyDown="timebox_PreviewKeyDown" />
-
-                <TextBox Height="35" HorizontalAlignment="Left" Margin="406,310,0,0" 
-                         Name="tbxStopRate" VerticalAlignment="Top" 
-                         
-                         Width="170" 
+                <TextBox Name="tbxStopRate"  Height="35" Width="170"  
+                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="406,310,0,0" 
                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-                         MinWidth="100" MinHeight="35" 
-                         
-                         IsReadOnly="True" 
-                         
-                         Text="0" 
-                         MaxLength="8" MaxHeight="35" 
-                         TextAlignment="Center" />
+                         IsReadOnly="True" Text="0" MaxLength="8" TextAlignment="Center" />
 
                 <Label Content=" —————————————————  " Height="25" HorizontalAlignment="Left" Margin="105,311,0,0" Name="label33" VerticalAlignment="Top" Width="230" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="16" />
                 <Label Content="停播总时长" Height="32" HorizontalAlignment="Left" Margin="123,293,0,0" Name="label34" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18" />
@@ -342,8 +347,8 @@
                 <Button Content="清空" Height="30" HorizontalAlignment="Left" Margin="338,276,0,0" Name="btnClear2" VerticalAlignment="Top" Width="60" Click="btnClear2_Click" RenderTransformOrigin="0.231,0.689" />
                 <Button Content="退出" Height="30" FontSize="16"  HorizontalAlignment="Right" Margin="0,0,10,11" x:Name="btnQuit_Tab02" VerticalAlignment="Bottom" Width="75" Click="btnQuit_Click" />
                 <Label Content="停播率 =" FontSize="22" Height="50" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="9,299,0,0" x:Name="labelStoprate" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="112" FontWeight="Normal" />
-                <Label Content="系统时间" Height="30" HorizontalAlignment="Left" Margin="286,384,0,0" Name="lblNow2" VerticalAlignment="Top" Width="160" />
-                <Label x:Name="labelUnit" Content="停播率单位：秒/百小时" HorizontalContentAlignment="Center"
+                <Label Content="系统时间" Height="30" HorizontalAlignment="Left" Margin="286,384,0,0" Name="lblNow2" VerticalAlignment="Top" Width="200" />
+                <Label x:Name="labelUnit" Content="单位：秒/百小时" HorizontalContentAlignment="Center"
                        HorizontalAlignment="Left" Margin="406,350,0,0" VerticalAlignment="Top" Width="170"/>
             </Grid>
         </TabItem>
@@ -373,8 +378,6 @@
                    FontSize="20"
                    Style="{DynamicResource MySimpleScrollBar}" SmallChange="1"
                    Maximum="12" Scroll="scb_Month_Scroll"  />
-
-
 
 
                 <!--接下来的textbox变为WaterMark Textbox-->
@@ -452,68 +455,6 @@
                            Minimum="0" />
 
 
-
-                <xctk:WatermarkTextBox 
-                    Height="30" Width="55" x:Name="wtbxOffHour3" 
-                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="138.4,209,0,0"
-                    VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
-                    
-                    PreviewTextInput="PreviewTextinput" TextChanged="grid1_textbox_TextChanged" 
-                    PreviewKeyDown="textbox_PreviewKeyDown" PreviewMouseDown="textbox_PreviewMouseDown" VerticalAlignment="Top" Grid.Column="1">
-                    <xctk:WatermarkTextBox.Watermark>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="时" Margin="4,0,0,0" />
-                        </StackPanel>
-                    </xctk:WatermarkTextBox.Watermark>
-
-                </xctk:WatermarkTextBox>
-
-                <xctk:WatermarkTextBox 
-                    Height="30" Width="55" x:Name="wtbxOffMin3" 
-                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="217.4,209,0,0"
-                    VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
-                    
-                    PreviewTextInput="PreviewTextinput" TextChanged="grid1_textbox_TextChanged" 
-                    PreviewKeyDown="textbox_PreviewKeyDown" PreviewMouseDown="textbox_PreviewMouseDown" VerticalAlignment="Top" Grid.Column="1">
-                    <xctk:WatermarkTextBox.Watermark>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="分" Margin="4,0,0,0" />
-                        </StackPanel>
-                    </xctk:WatermarkTextBox.Watermark>
-
-                </xctk:WatermarkTextBox>
-
-                <xctk:WatermarkTextBox 
-                    Height="30" Width="55" x:Name="wtbxOnHour3" 
-                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="138.4,243,0,0"
-                    VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
-                    
-                    PreviewTextInput="PreviewTextinput" TextChanged="grid1_textbox_TextChanged" 
-                    PreviewKeyDown="textbox_PreviewKeyDown" PreviewMouseDown="textbox_PreviewMouseDown" VerticalAlignment="Top" Grid.Column="1">
-                    <xctk:WatermarkTextBox.Watermark>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="时" Margin="4,0,0,0" />
-                        </StackPanel>
-                    </xctk:WatermarkTextBox.Watermark>
-
-                </xctk:WatermarkTextBox>
-
-                <xctk:WatermarkTextBox 
-                    Height="30" Width="55" x:Name="wtbxOnMin3" 
-                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="217.4,243,0,0"
-                    VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
-                    
-                    PreviewTextInput="PreviewTextinput" TextChanged="grid1_textbox_TextChanged" 
-                    PreviewKeyDown="textbox_PreviewKeyDown" PreviewMouseDown="textbox_PreviewMouseDown" VerticalAlignment="Top" Grid.Column="1">
-                    <xctk:WatermarkTextBox.Watermark>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="分" Margin="4,0,0,0" />
-                        </StackPanel>
-                    </xctk:WatermarkTextBox.Watermark>
-
-                </xctk:WatermarkTextBox>
-
-
                 <xctk:WatermarkTextBox 
                     Height="30" Width="55" Name="wtbxOffHour2" 
                     HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="378.8,60,0,0"
@@ -575,7 +516,7 @@
                 </xctk:WatermarkTextBox>
 
 
-                <Label Height="30" HorizontalAlignment="Left" Margin="247.4,384,0,0" Name="lblNow1" VerticalAlignment="Top" Width="162" Content="系统时间" Grid.Column="1"></Label>
+                <Label Height="30" HorizontalAlignment="Left" Margin="247.4,384,0,0" Name="lblNow1" VerticalAlignment="Top" Width="200" Content="系统时间" Grid.Column="1"></Label>
                 <Label Content="几个周二不停机检修" FontSize="16" Height="30" HorizontalAlignment="Left" Margin="16,136,0,0" Name="label4" VerticalAlignment="Top" Width="165" Grid.ColumnSpan="2"></Label>
                 <Label Content="几个周三不停机检修" FontSize="16" Height="30" HorizontalAlignment="Left" Margin="16,172,0,0" Name="label5" VerticalAlignment="Top" Width="165" Grid.ColumnSpan="2"></Label>
 
@@ -584,8 +525,8 @@
                 <Label Content="月传输播出时间：" FontSize="20" Height="40" HorizontalAlignment="Left" Margin="16,331,0,0" Name="label8" VerticalAlignment="Top" Grid.ColumnSpan="2"></Label>
 
                 <Label Content="小时" FontSize="20" Height="40" HorizontalAlignment="Left" Margin="247.4,331,0,0" Name="label9" VerticalAlignment="Top" Grid.Column="1"></Label>
-                <Label Content="周三停止播出时间" FontSize="16" Height="40" HorizontalAlignment="Left" Margin="16,208,0,0" Name="label20" VerticalAlignment="Top" Width="160" Grid.ColumnSpan="2"></Label>
-                <Label Content="周三开始播出时间" FontSize="16" Height="40" HorizontalAlignment="Left" Margin="16,242,0,0" Name="label26" VerticalAlignment="Top" Width="160" Grid.ColumnSpan="2"></Label>
+                <!--<Label Content="周三停止播出时间" FontSize="16" Height="40" HorizontalAlignment="Left" Margin="16,208,0,0" Name="label20" VerticalAlignment="Top" Width="160" Grid.ColumnSpan="2"></Label>
+                <Label Content="周三开始播出时间" FontSize="16" Height="40" HorizontalAlignment="Left" Margin="16,242,0,0" Name="label26" VerticalAlignment="Top" Width="160" Grid.ColumnSpan="2"></Label>-->
                 <Label Content="至：" FontSize="16" Height="30" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="343.8,94,0,0" Name="label23" VerticalAlignment="Top" Grid.Column="1"></Label>
                 <Label Content="请输入年/月    " FontSize="16" Height="Auto" HorizontalAlignment="Left" Margin="16,14,0,0" Name="label10" VerticalAlignment="Top" Width="160" HorizontalContentAlignment="Right" Grid.ColumnSpan="2"></Label>
                 <Button Content="计算" Height="40" HorizontalAlignment="Left" Margin="297.4,331,0,0" Name="btnCalculate" VerticalAlignment="Top" Width="60" Click="btnCalculate_Click" Grid.Column="1"></Button>
@@ -599,15 +540,15 @@
                          Grid.Column="1">
                 </TextBox>
 
-                <CheckBox Content="周二下午停机检修时间" FontSize="16" Height="Auto" Width="Auto" Name="chkBox_Tuesday" Margin="343.8,36,0,0"
+                <CheckBox Content="周二停机检修时间" FontSize="16" Height="Auto" Width="Auto" Name="chkBox_Tuesday" Margin="360.8,36,0,0"
                           HorizontalAlignment="Left" HorizontalContentAlignment="Center"  VerticalAlignment="Top" VerticalContentAlignment="Center"
                           Checked="chkBox_Tuesday_Checked" Unchecked="chkBox_Tuesday_UnChecked" Grid.Column="1"/>
                 <Label Content="分中心：" Height="28" HorizontalAlignment="Left" Margin="16,284,0,0" Name="label37" VerticalAlignment="Top" Grid.ColumnSpan="2" />
 
                 <ComboBox Height="25" HorizontalAlignment="Left" Margin="41.4,287,0,0" 
                       Name="cbx_city" VerticalAlignment="Top" Width="105"  Grid.Column="1" 
-                          SelectionChanged="cbx_city_SelectionChanged" DropDownClosed="cbx_city_DropDownClosed" PreviewMouseWheel="cbx_city_PreviewMouseWheel"
-                />
+                          SelectionChanged="cbx_city_SelectionChanged" DropDownClosed="cbx_city_DropDownClosed" 
+                          PreviewMouseWheel="cbx_city_PreviewMouseWheel"/>
 
 
                 <Label Content="台站：" Height="28" HorizontalAlignment="Left" Margin="163.4,285,0,0" Name="label38" VerticalAlignment="Top" Grid.Column="1" />
@@ -623,15 +564,23 @@
 
                 <Label Content="：" Height="28" HorizontalAlignment="Left" Margin="193.4,56,0,0" Name="label2" VerticalAlignment="Top" Grid.Column="1" />
 
-                <CheckBox Content="当月最后周二停机检修时间" 
+                <CheckBox Content="当月最后周二停机检修" 
                     VerticalAlignment="Top" HorizontalAlignment="Left"
                     HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                    x:Name="chkBox_LastTuesday" Margin="343.8,151,0,0" Height="Auto" Width="Auto"
+                    x:Name="chkBox_LastTuesday" Margin="360.8,130,0,0" Height="Auto" Width="180"
                     FontSize="16" Checked="chkBox_LastTuesday_Checked" Unchecked="chkBox_LastTuesday_Unchecked" Grid.Column="1" />
 
+                <CheckBox Content="周三停机检修时间" FontSize="16" Height="Auto" Width="Auto" 
+                    x:Name="chkBox_Wednesday" Margin="360.8,183,0,0"
+                    HorizontalAlignment="Left" HorizontalContentAlignment="Center"  
+                    VerticalAlignment="Top" VerticalContentAlignment="Center"
+                          
+                    Grid.Column="1"/>
+                
+                
                 <xctk:WatermarkTextBox 
-                    Height="30" Width="55" Name="offHourLast2" 
-                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="378.8,175,0,0"
+                    Height="30" Width="55" Name="offHour3" 
+                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="378.8,208,0,0"
                     VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
                     
                     PreviewTextInput="PreviewTextinput" TextChanged="grid1_textbox_TextChanged" 
@@ -644,8 +593,8 @@
 
                 </xctk:WatermarkTextBox>
                 <xctk:WatermarkTextBox 
-                    Height="30" Width="55" Name="offMinLast2" 
-                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="453.8,175,0,0"
+                    Height="30" Width="55" Name="offMin3" 
+                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="453.8,208,0,0"
                     VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
                     
                     PreviewTextInput="PreviewTextinput" TextChanged="grid1_textbox_TextChanged" 
@@ -658,8 +607,8 @@
 
                 </xctk:WatermarkTextBox>
                 <xctk:WatermarkTextBox 
-                    Height="30" Width="55" Name="onHounLast2" 
-                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="378.8,210,0,0"
+                    Height="30" Width="55" Name="onHour3" 
+                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="378.8,243,0,0"
                     VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
                     
                     PreviewTextInput="PreviewTextinput" TextChanged="grid1_textbox_TextChanged" 
@@ -672,8 +621,8 @@
 
                 </xctk:WatermarkTextBox>
                 <xctk:WatermarkTextBox 
-                    Height="30" Width="55" Name="onMinLast2" 
-                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="453.8,210,0,0"
+                    Height="30" Width="55" Name="onMin3" 
+                    HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="453.8,243,0,0"
                     VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
                     
                     PreviewTextInput="PreviewTextinput" TextChanged="grid1_textbox_TextChanged" 
@@ -685,7 +634,9 @@
                     </xctk:WatermarkTextBox.Watermark>
 
                 </xctk:WatermarkTextBox>
-                <Label Content="至：" FontSize="16" Height="30" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="343.8,210,0,0" x:Name="label23_Copy" VerticalAlignment="Top" Grid.Column="1"/>
+                <Label Content="至：" FontSize="16" Height="30" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="343.8,243,0,0" x:Name="label23_Copy" VerticalAlignment="Top" Grid.Column="1"/>
+                
+
             </Grid>
         </TabItem>
         <!--月播出时间统计-->

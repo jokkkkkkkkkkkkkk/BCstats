@@ -87,7 +87,7 @@
                 <Setter Property="ToolTipService.HasDropShadow" Value="true" />
                 <Setter Property="ToolTipService.BetweenShowDelay" Value="3900" />
 
-                <Setter Property="Background" Value="GreenYellow"/>
+                <!--<Setter Property="Background" Value="GreenYellow"/>-->
             </Trigger>
 
             <Trigger Property="IsSelected" Value="True">
@@ -109,23 +109,12 @@
 
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <!--<Setter Property="FontFamily" Value="Arial" />-->
-                <!--<Setter Property="FontSize" Value="16" />-->
-
-                <Setter Property="ToolTip" Value="单击复制到剪切板" />
-                <!--<Setter Property="ToolTipService.ShowDuration" Value="1500" />
-                <Setter Property="ToolTipService.PlacementRectangle" Value="0,0,0,0" />
-                <Setter Property="ToolTipService.VerticalOffset" Value="-2" />
-                <Setter Property="ToolTipService.HasDropShadow" Value="true" />
-                <Setter Property="ToolTipService.BetweenShowDelay" Value="3900" />-->
-
-                <Setter Property="Background" Value="GreenYellow"/>
+                <Setter Property="ToolTip" Value="选中后，按下Ctrl+C复制" />
+                <!--<Setter Property="Background" Value="GreenYellow"/>-->
             </Trigger>
 
             <Trigger Property="IsSelected" Value="True">
-                <!--<Setter Property="Height" Value="38"/>-->
-
-                <Setter Property="Background" Value="Cornsilk"/>
+                <Setter Property="Background" Value="LightGreen"/>
                 <Setter Property="Foreground" Value="Black"/>
                 <Setter Property="BorderBrush" Value="Black"/>
 
@@ -146,7 +135,7 @@
         <Style.Triggers >
 
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="OldLace"/>
+                <Setter Property="Background" Value="LightGreen"/>
                 <Setter Property="Foreground" Value="Black"/>
 
                 <!--<Setter Property="FontSize" Value="16" />
@@ -186,12 +175,12 @@
         <Style.Triggers >
 
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="OldLace"/>
+                <Setter Property="Background" Value="LightGreen"/>
                 <Setter Property="Foreground" Value="Black"/>
 
                 <Setter Property="FontSize" Value="14" />
 
-                <Setter Property="ToolTip" Value="单击复制内容" />
+                <Setter Property="ToolTip" Value="选中后，按下Ctrl+C复制" />
                 <Setter Property="ToolTipService.InitialShowDelay" Value="500" />
                 <Setter Property="ToolTipService.ShowDuration" Value="2000" />
                 <Setter Property="ToolTipService.PlacementRectangle" Value="0,0,0,0" />
@@ -212,4 +201,25 @@
 
     </Style>
 
+    
+    
+        <!--ssw_TextBoxStyle
+        播出统计数据 TextBox：时长之和 
+        -->
+    <Style x:Key="ssw_TextBoxStyle"
+               TargetType="{x:Type TextBox}">
+        <Setter Property="Width" Value="60" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontSize" Value="16" />
+
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    
 </ResourceDictionary>

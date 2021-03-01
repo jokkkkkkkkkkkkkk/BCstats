@@ -272,7 +272,7 @@ class SQLiteHelper {
             }
             reader.Close();
             return Column;
-        } catch (Exception ex) {
+        } catch {
             return null;
         } finally {
             closeConn();
@@ -334,7 +334,7 @@ class SQLiteHelper {
                 return 0;
             }
             return value;
-        } catch (Exception ex) {
+        } catch {
             return 0;
         } finally {
             closeConn();
@@ -448,7 +448,7 @@ class SQLiteHelper {
             else if (m_dbConnection.State == ConnectionState.Broken) {
                 m_dbConnection.Close();
             }
-        } catch (Exception ex) {
+        } catch {
             ;
         }
     }

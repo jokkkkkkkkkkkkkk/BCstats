@@ -39,6 +39,8 @@ namespace BCstats {
                 // TimeTableWindow_dataGrid1.Items.Clear();
                 // 将表对象作为DataGrid的数据源
                 TimeTableWindow_dataGrid1.ItemsSource = dt.DefaultView;
+                // 数据排序:根据台站名称
+                (TimeTableWindow_dataGrid1.ItemsSource as DataView).Sort = BCstatsHelper.STR_STATION;
                 // 禁止用户排序
                 TimeTableWindow_dataGrid1.CanUserSortColumns = false;
                 // 阻止最后一行的空行
@@ -54,19 +56,7 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnRefresh_Click(object sender, RoutedEventArgs e) {
-            try {
-                DataTable dt = new DataTable();
-                SQLiteDataReader reader = helper.ReadFullTable(BCstatsHelper.tableName);
-                dt.Load(reader);
-
-                TimeTableWindow_dataGrid1.ItemsSource = dt.DefaultView;
-                // 禁止用户排序
-                TimeTableWindow_dataGrid1.CanUserSortColumns = false;
-                // 阻止最后一行的空行
-                TimeTableWindow_dataGrid1.CanUserAddRows = false;
-            } catch (Exception ex) {
-                MessageBox.Show("读取数据库错误：" + ex.ToString());
-            }
+            TimeTableWindow_Loaded(sender, e);
         }
 
         /// <summary>
@@ -84,6 +74,7 @@ namespace BCstats {
             dt.Columns[BCstatsHelper.STR_CITY].DefaultValue = BCstatsHelper.STR_CITY_CH;
             dt.Columns[BCstatsHelper.STR_STATION].DefaultValue = BCstatsHelper.STR_STATION_CH;
             dt.Columns[BCstatsHelper.STR_FREQUENCY].DefaultValue = BCstatsHelper.STR_FREQUENCY_CH;
+            dt.Columns[BCstatsHelper.STR_STOP_3].DefaultValue = "0";
             dt.Columns[BCstatsHelper.STR_STOP_2].DefaultValue = "0";
             dt.Columns[BCstatsHelper.STR_STOP_LAST_2].DefaultValue = "0";
             // 时间单元格，默认为"0000"
@@ -91,6 +82,7 @@ namespace BCstats {
             arr.Remove(BCstatsHelper.STR_CITY);
             arr.Remove(BCstatsHelper.STR_STATION);
             arr.Remove(BCstatsHelper.STR_FREQUENCY);
+            arr.Remove(BCstatsHelper.STR_STOP_3);
             arr.Remove(BCstatsHelper.STR_STOP_2);
             arr.Remove(BCstatsHelper.STR_STOP_LAST_2);
             for (int i = 0; i < arr.Count; i++) {
@@ -193,46 +185,18 @@ namespace BCstats {
             mw.rbtnLastTuesday.IsChecked = false;
             mw.chkBox_Tuesday.IsChecked = false;
             // 关闭台站播出统计子窗口
-            if (Application.Current.Windows.Count == 4) {
-                StationStatsWindow sw = Application.Current.Windows[2] as StationStatsWindow;
-                sw.Close();
+            //if (Application.Current.Windows.Count > 2) {
+            //    StationStatsWindow sw = Application.Current.Windows[2] as StationStatsWindow;
+            //    sw.Close();
+            //}
+            foreach (Window window in Application.Current.Windows) {
+                if (window.Name == BCstatsHelper.STR_StationStatsWindow_NAME) {
+                    window.Close();
+                }
             }
             // 主窗口位置恢复到屏幕中央
             mw.Left = MainWindow.mwLeft;
             mw.Top = MainWindow.mwTop;
-        }
-
-
-        /// <summary>
-        /// 开始编辑单元格
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TimeTableWindow_dataGrid1_BeginningEdit(object sender, DataGridBeginningEditEventArgs e) 
-        {           
-            //try
-            //{
-            //    //读取选中的单元格的值，传到MessageBox
-
-            //    //假设这里就是操作文本列
-           /* if (TimeTableWindow_dataGrid1.CurrentColumn.Header.ToString() != "周二检修否")    //选中其他
-            {
-                var preValue = (e.Column.GetCellContent(e.Row) as TextBlock).Text;
-
-                MessageBox.Show(preValue);
-            }
-            else  ////选中"周二检修否"
-            {
-                var preValue = (e.Column.GetCellContent(e.Row) as CheckBox).IsChecked.Value.ToString();
-
-                MessageBox.Show(preValue);
-            }
-            //}
-            //catch (Exception caught)
-            //{
-            //    MessageBox.Show(caught.Message);              
-            //}
-            */
         }
 
         /// <summary>
@@ -257,8 +221,6 @@ namespace BCstats {
             }
 
         }
-
-
 
 
         #region 本窗口 textbox 通用事件
