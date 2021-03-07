@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Data;
 using System.Windows;
 using System.Collections;
+using System.IO;
 
 class SQLiteHelper {
 
@@ -47,7 +48,7 @@ class SQLiteHelper {
         } catch (Exception e) {
             Log(e.Message);
         }
-
+        
         return dataReader;
     }
 
@@ -73,7 +74,6 @@ class SQLiteHelper {
     }
 
 
-
     /// <summary>
     /// 关闭数据库连接
     /// </summary>
@@ -96,6 +96,61 @@ class SQLiteHelper {
 
     }
 
+
+    /// <summary>
+    /// 判断数据库文件是否存在
+    /// </summary>
+    /// <returns></returns>
+    public bool CheckDataBase(string dbFileName) {
+        try {
+            //判断数据文件是否存在
+            string dbFilePath = AppDomain.CurrentDomain.BaseDirectory + dbFileName;
+            bool dbExist = File.Exists(dbFilePath);
+            if (!dbExist) {
+                MessageBox.Show("数据库文件 " + dbFilePath +" 不存在。");
+            } else {
+                //MessageBox.Show("数据库文件 " + dbFilePath + " 存在。");
+            }
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+    /// <summary>
+    /// 判断数据表书否存在
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <returns></returns>
+    public bool CheckDataTable(string connectionString, string tableName) {
+        try {
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+            using (SQLiteCommand cmd = conn.CreateCommand()) {
+                conn.Open();
+                cmd.CommandText = 
+                    string.Format(
+                        "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = '{0}'", 
+                        tableName);
+                object ob = cmd.ExecuteScalar();
+                long tableCount = Convert.ToInt64(ob);
+                if (tableCount != 0) {
+                    // 存在
+                    //MessageBox.Show("表存在");
+                    return true;
+                } else if (tableCount == 0) {
+                    //MessageBox.Show("表不存在");
+                    return false;
+                } else {
+                    //MessageBox.Show("表存在");
+                    return true;
+                }
+            }
+        } catch (Exception ex) {
+            MessageBox.Show("读取数据表错误：" + ex.ToString());
+            return false;
+        }
+    }
+
+
     /// <summary>
     /// 读取整张数据表
     /// </summary>
@@ -105,8 +160,6 @@ class SQLiteHelper {
         string queryString = "SELECT * FROM " + tableName;
         return ExecuteQuery(queryString);
     }
-
-
 
 
     /// <summary>
@@ -125,6 +178,10 @@ class SQLiteHelper {
         //return null;
         return ExecuteQuery(queryString);
     }
+
+
+
+
 
 
 
@@ -157,7 +214,7 @@ class SQLiteHelper {
         }
         //queryString += " WHERE " + key + operation + "'" + value + "'";
         queryString += " WHERE " + key + operation + value;
-        //MessageBox.Show("queryString : " + queryString);
+        Console.WriteLine("queryString : " + queryString);
         return ExecuteQuery(queryString);
     }
 
@@ -257,6 +314,23 @@ class SQLiteHelper {
 
 
     /// <summary>
+    /// 根据一个条件，选出符合该条件的数据
+    /// </summary>
+    /// <param name="tableName"></param>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+     public SQLiteDataReader GetDataBy(string tableName, string key, string value) {
+        string queryString 
+            = string.Format("SELECT * FROM {0} WHERE {1}='{2}'",
+            tableName,
+            key, value);
+        return ExecuteQuery(queryString);
+    }
+
+
+
+    /// <summary>
     /// 查询一列数据
     /// </summary>
     /// <param name="connectionString">连接字符串</param>
@@ -280,6 +354,25 @@ class SQLiteHelper {
     }
 
 
+    /// <summary>
+    /// 判断记录是否存在：where key=value
+    /// </summary>
+    /// <param name="connectString"></param>
+    /// <param name="tableName"></param>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public bool IfExists(string connectString, string tableName, string key, string value) {
+        string sql = string.Format("SELECT ISNULL((SELECT TOP(1) 1 FROM {0} WHERE {1}='{2}'), 0)" ,
+            tableName, key, value);
+        if(Convert.ToInt16(ExecuteScalar(connectString, sql)) == 1) {
+            // 存在
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     /// <summary>
     /// 获取指定频率的某个时间的字符串
@@ -290,7 +383,7 @@ class SQLiteHelper {
     public  string GetTimeValue(string city, string station, string frequency, string fieldName) {
         try {
             string sql = 
-                string.Format("SELECT {0} FROM freqs where city='{1}' and station='{2}' and frequency='{3}'", 
+                string.Format("SELECT {0} FROM freqs WHERE city='{1}' AND station='{2}' AND frequency='{3}'", 
                 fieldName, city, station, frequency);
             //MessageBox.Show("GetTimeValue sql: " + sql);
             SQLiteDataReader reader = ExecuteQuery(sql);
@@ -321,7 +414,7 @@ class SQLiteHelper {
     public int GetIntValue(string city, string station, string frequency, string fieldName) {
         try {
             string sql =
-                string.Format("SELECT {0} FROM freqs where city='{1}' and station='{2}' and frequency='{3}'",
+                string.Format("SELECT {0} FROM freqs WHERE city='{1}' AND station='{2}' AND frequency='{3}'",
                 fieldName, city, station, frequency);
             //MessageBox.Show("GetIntValue sql: " + sql);
             SQLiteDataReader reader = ExecuteQuery(sql);
@@ -347,20 +440,20 @@ class SQLiteHelper {
     /// </summary>
     /// <param name="connectionString"></param>
     /// <param name="columnName"></param>
-    /// <param name="whereName"></param>
-    /// <param name="whereValue"></param>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public List<string> GetColunmValues(string connectionString,
+    public List<string> GetColunmValues(string connectionString, string tableName,
                                 string columnName,
-                                string whereName, string whereValue) {
+                                string key, string value) {
         try {
             string sql;
-            if (whereName != null && whereValue != null) {
+            if (key != null && value != null) {
                 sql = string.Format("SELECT {0} FROM {1} WHERE {2}='{3}'",
-                    columnName, BCstatsHelper.tableName,
-                    whereName, whereValue);
+                    columnName, tableName,
+                    key, value);
             } else {
-                sql = string.Format("SELECT {0} FROM {1}", columnName, BCstatsHelper.tableName);
+                sql = string.Format("SELECT {0} FROM {1}", columnName, tableName);
             }
             return GetColmn(connectionString, sql);
         } catch {
@@ -373,20 +466,20 @@ class SQLiteHelper {
     /// </summary>
     /// <param name="connectionString"></param>
     /// <param name="columnName"></param>
-    /// <param name="whereName"></param>
-    /// <param name="whereValue"></param>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public List<string> GetColunmDistinctValues(string connectionString,
+    public List<string> GetColunmDistinctValues(string connectionString, string tableName,
                                 string columnName,
-                                string whereName, string whereValue) {
+                                string key, string value) {
         try {
             string sql;
-            if (whereName != null && whereValue != null) {
+            if (key != null && value != null) {
                 sql = string.Format("SELECT DISTINCT {0} FROM {1} WHERE {2}='{3}'",
-                    columnName, BCstatsHelper.tableName,
-                    whereName, whereValue);
+                    columnName, tableName,
+                    key, value);
             } else {
-                sql = string.Format("SELECT DISTINCT {0} FROM {1}", columnName, BCstatsHelper.tableName);
+                sql = string.Format("SELECT DISTINCT {0} FROM {1}", columnName, tableName);
             }
             return GetColmn(connectionString, sql);
         } catch {
@@ -400,19 +493,19 @@ class SQLiteHelper {
     /// 获取数据表中某一种数据的数量
     /// </summary>
     /// <param name="connectionString"></param>
-    /// <param name="whereName"></param>
-    /// <param name="whereValue"></param>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public int GetDataCount(string connectionString,
-                                string whereName, string whereValue) {
+    public int GetDataCounBy(string connectionString, string tableName,
+                                string key, string value) {
         try {
             string sql;
-            if (whereName != null && whereValue != null) {
+            if (key != null && value != null) {
                 sql = string.Format("SELECT COUNT(*) FROM {0} WHERE {1}='{2}'",
-                    BCstatsHelper.tableName,
-                    whereName, whereValue);
+                    tableName,
+                    key, value);
             } else {
-                sql = string.Format("SELECT COUNT(*) FROM {1}", BCstatsHelper.tableName);
+                sql = string.Format("SELECT COUNT(*) FROM {1}", tableName);
             }
             return Convert.ToInt16(ExecuteScalar(connectionString, sql));
         } catch {
@@ -420,6 +513,23 @@ class SQLiteHelper {
         }
 
 
+
+    }
+
+
+    /// <summary>
+    /// 获取数据表中所有数据的数量
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <param name="tableName"></param>
+    /// <returns></returns>
+    public int GetDataCounts(string connectionString, string tableName) {
+        try {
+            string sql = "SELECT COUNT(*) FROM " + tableName;
+            return Convert.ToInt16(ExecuteScalar(connectionString, sql));
+        } catch {
+            return 0;
+        }
 
     }
 

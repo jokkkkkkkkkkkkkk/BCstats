@@ -21,7 +21,7 @@ namespace BCstats {
         }
 
         #region SQLite 常量定义
-        private SQLiteHelper helper = new SQLiteHelper(BCstatsHelper.connectionString);
+        private SQLiteHelper sqlHelper = new SQLiteHelper(BCstatsHelper.connectionString);
         #endregion
 
 
@@ -32,19 +32,28 @@ namespace BCstats {
         /// <param name="e"></param>
         private void TimeTableWindow_Loaded(object sender, RoutedEventArgs e) {
             try {
-                DataTable dt = new DataTable();
-                SQLiteDataReader reader = helper.ReadFullTable(BCstatsHelper.tableName);
-                dt.Load(reader);
+                MainWindow mw = Application.Current.Windows[0] as MainWindow;
+                if (mw.cboxCity.SelectedIndex != -1 && mw.cboxStation.SelectedIndex != -1) {
+                    if (sqlHelper.CheckDataBase(BCstatsHelper.dbFileName)
+                        && sqlHelper.CheckDataTable(BCstatsHelper.connectionString, BCstatsHelper.tableName)) {
+                        DataTable dt = new DataTable();
+                        SQLiteDataReader reader = sqlHelper.GetDataBy(BCstatsHelper.tableName, 
+                            BCstatsHelper.STR_STATION , mw.cboxStation.Text);
+                        dt.Load(reader);
 
-                // TimeTableWindow_dataGrid1.Items.Clear();
-                // 将表对象作为DataGrid的数据源
-                TimeTableWindow_dataGrid1.ItemsSource = dt.DefaultView;
-                // 数据排序:根据台站名称
-                (TimeTableWindow_dataGrid1.ItemsSource as DataView).Sort = BCstatsHelper.STR_STATION;
-                // 禁止用户排序
-                TimeTableWindow_dataGrid1.CanUserSortColumns = false;
-                // 阻止最后一行的空行
-                TimeTableWindow_dataGrid1.CanUserAddRows = false;
+                        // TimeTableWindow_dataGrid1.Items.Clear();
+                        // 将表对象作为DataGrid的数据源
+                        TimeTableWindow_dataGrid1.ItemsSource = dt.DefaultView;
+                        // 数据排序:根据台站名称
+                        (TimeTableWindow_dataGrid1.ItemsSource as DataView).Sort = BCstatsHelper.STR_STATION;
+                        // 禁止用户排序
+                        TimeTableWindow_dataGrid1.CanUserSortColumns = false;
+                        // 阻止最后一行的空行
+                        TimeTableWindow_dataGrid1.CanUserAddRows = false;
+                    }
+                } else {
+                    MessageBox.Show("请先选择地点和台站。");
+                }
             } catch (Exception ex) {
                 MessageBox.Show("读取数据库错误：" + ex.ToString());
             }
@@ -59,20 +68,45 @@ namespace BCstats {
             TimeTableWindow_Loaded(sender, e);
         }
 
+
+
         /// <summary>
-        /// 按钮：添加新行
+        /// 按钮：添加台站
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnAdd_Click(object sender, RoutedEventArgs e) {
+        private void btnAddStation_Click(object sender, RoutedEventArgs e) {
+
+
+
+
+        }
+
+
+
+
+        /// <summary>
+        /// 按钮：添加节目
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnAddProgram_Click(object sender, RoutedEventArgs e) {
+            MainWindow mw = Application.Current.Windows[0] as MainWindow;
+
             DataTable dt = new DataTable();
-            SQLiteDataReader reader = helper.ReadFullTable(BCstatsHelper.tableName);
+            //SQLiteDataReader reader = sqlHelper.ReadFullTable(BCstatsHelper.tableName);
+            SQLiteDataReader reader 
+                = sqlHelper.GetDataBy(BCstatsHelper.tableName, 
+                BCstatsHelper.STR_STATION ,mw.cboxStation.Text);
+
             dt.Load(reader);
             TimeTableWindow_dataGrid1.ItemsSource = dt.DefaultView;
             ArrayList arr = BCstatsHelper.getColumnNames(dt);
             // 设置新创建的行的单元格的默认值：非时间单元格
-            dt.Columns[BCstatsHelper.STR_CITY].DefaultValue = BCstatsHelper.STR_CITY_CH;
+            dt.Columns[BCstatsHelper.STR_CITY].DefaultValue = "市";
             dt.Columns[BCstatsHelper.STR_STATION].DefaultValue = BCstatsHelper.STR_STATION_CH;
+            dt.Columns[BCstatsHelper.STR_CATEGORY].DefaultValue = BCstatsHelper.STR_FM;
+            dt.Columns[BCstatsHelper.STR_NAME].DefaultValue = "节目";
             dt.Columns[BCstatsHelper.STR_FREQUENCY].DefaultValue = BCstatsHelper.STR_FREQUENCY_CH;
             dt.Columns[BCstatsHelper.STR_STOP_3].DefaultValue = "0";
             dt.Columns[BCstatsHelper.STR_STOP_2].DefaultValue = "0";
@@ -81,6 +115,8 @@ namespace BCstats {
             arr.Remove(BCstatsHelper.STR_ID);
             arr.Remove(BCstatsHelper.STR_CITY);
             arr.Remove(BCstatsHelper.STR_STATION);
+            arr.Remove(BCstatsHelper.STR_CATEGORY);
+            arr.Remove(BCstatsHelper.STR_NAME);
             arr.Remove(BCstatsHelper.STR_FREQUENCY);
             arr.Remove(BCstatsHelper.STR_STOP_3);
             arr.Remove(BCstatsHelper.STR_STOP_2);
@@ -98,41 +134,46 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnSave_Click(object sender, RoutedEventArgs e) {
+            MainWindow mw = Application.Current.Windows[0] as MainWindow;
             try {
+                // 根据台站名称，获取该台站的节目数量
+                int programsCount = sqlHelper.GetDataCounBy(BCstatsHelper.connectionString, BCstatsHelper.tableName,
+                    BCstatsHelper.STR_STATION, mw.cboxStation.Text);
+                //Console.WriteLine("该台站的节目数量：" + programsCount);
+
                 DataTable dt = new DataTable();
                 // 用DataTable读取datagrid内容
                 dt = ((DataView)TimeTableWindow_dataGrid1.ItemsSource).ToTable();
                 // 获取DataTable所有的列名称
                 ArrayList columnNames = BCstatsHelper.getColumnNames(dt);
                 //PrintArray(columnNamess);
-
-                //MessageBox.Show("Grid DataTable 总条数/总行数: " + dt.Rows.Count);
-
-                string sql = "SELECT COUNT(*) FROM " + BCstatsHelper.tableName;
-                int tableRowsCount = Convert.ToInt16(helper.ExecuteScalar(BCstatsHelper.connectionString, sql));
-                //Console.WriteLine("数据库中表的总条数：" + tableRowsCount);
-
+                //Console.WriteLine("Grid DataTable 总条数/总行数: " + dt.Rows.Count);
+               
                 // 在datatable新增了数据条目
-                if (dt.Rows.Count > tableRowsCount) {
+                if (dt.Rows.Count > programsCount) {
                     // 执行插入语句的次数，即比较后多出的行数
-                    for(int i = 1; i <= dt.Rows.Count - tableRowsCount; i++) {
+                    for(int i = 1; i <= dt.Rows.Count - programsCount; i++) {
                         //MessageBox.Show("预备插入的数据：");
-                        helper.InsertValues(BCstatsHelper.tableName, BCstatsHelper.getTheRowValues(dt, dt.Rows.Count - i));
+                        sqlHelper.InsertValues(BCstatsHelper.tableName, BCstatsHelper.getTheRowValues(dt, dt.Rows.Count - i));
                     }
-                } else if(dt.Rows.Count == tableRowsCount) {
+                } else if(dt.Rows.Count == programsCount) {
                     //MessageBox.Show("Grid DataTable 总条数/总行数: " + dt.Rows.Count);
                     //MessageBox.Show("数据库中表的总条数：" + tableRowsCount);
                     //MessageBox.Show("多出行数：" + (dt.Rows.Count - tableRowsCount).ToString());
                     // 更新数据库表：第 id 行的值，所有的列名
                     for (int i = 0; i < dt.Rows.Count; i++) {
-                        helper.UpdateValues(BCstatsHelper.tableName,
+                        sqlHelper.UpdateValues(BCstatsHelper.tableName,
                             columnNames, BCstatsHelper.getTheRowValues(dt, i),
                             BCstatsHelper.STR_ID, BCstatsHelper.getTheRowValues(dt, i)[0].ToString());
                         // 打印输出，验证结果
                         //PrintArray(BCstatsHelper.getTheRowValuess(dt, i));
                     }
                 } else {
-                    ;
+                    ArrayList arr = new ArrayList(sqlHelper.GetColunmValues(
+                        BCstatsHelper.connectionString, BCstatsHelper.tableName,
+                        BCstatsHelper.STR_ID,
+                        BCstatsHelper.STR_STATION, mw.cboxStation.Text));
+                    sqlHelper.PrintArray(arr);
                 }
             } catch (Exception ex) {
                 MessageBox.Show("更新数据Error：" + ex.ToString());
@@ -151,13 +192,13 @@ namespace BCstats {
                 DataRowView dataRowView = (DataRowView)TimeTableWindow_dataGrid1.SelectedItem;
                 int id = Convert.ToInt16(dataRowView.Row[0].ToString());
                 try {
-                    helper.DeleteValuesByRowId(BCstatsHelper.tableName, id);
+                    sqlHelper.DeleteValuesByRowId(BCstatsHelper.tableName, id);
                 } catch(Exception ex) {
                     MessageBox.Show("删除数据Error：" + ex.ToString());
                 } finally {
                     try {
                         DataTable dt = new DataTable();
-                        SQLiteDataReader reader = helper.ReadFullTable(BCstatsHelper.tableName);
+                        SQLiteDataReader reader = sqlHelper.ReadFullTable(BCstatsHelper.tableName);
                         dt.Load(reader);
                         TimeTableWindow_dataGrid1.ItemsSource = dt.DefaultView;
                         TimeTableWindow_dataGrid1.CanUserSortColumns = false;
@@ -181,6 +222,7 @@ namespace BCstats {
             mw.cboxFrequency.SelectedIndex = -1;
             mw.cbx_frequency.SelectedIndex = -1;
             mw.tbxTotalHours.Text = string.Empty;
+            mw.lblDetail.Text = string.Empty;
             mw.Hours.Text = string.Empty;
             mw.rbtnLastTuesday.IsChecked = false;
             mw.chkBox_Tuesday.IsChecked = false;
@@ -214,7 +256,7 @@ namespace BCstats {
                 ArrayList values = BCstatsHelper.getTheRowValues(dt, id);
 
                 if (values.Contains(String.Empty)) {
-                    MessageBox.Show("分中心/台站/时间都不能为空！");
+                    MessageBox.Show("地点/台站/时间都不能为空！");
                 }
             } catch {
                 //MessageBox.Show(caught.Message);
@@ -290,6 +332,7 @@ namespace BCstats {
             }
             return true;
         }
+
 
 
         #endregion

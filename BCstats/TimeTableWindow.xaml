@@ -76,6 +76,7 @@
                   
                   ColumnWidth="*"
                   SelectionMode="Single"
+                  SelectionUnit="Cell"
                   AutoGenerateColumns="False" 
                   
                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
@@ -119,7 +120,7 @@
                                     EditingElementStyle="{StaticResource TextCellEditingElementStyle}"     
                                     Binding="{Binding station, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTextColumn Header="类型"     HeaderStyle="{StaticResource dg_HeaderStyle}"   
-                                    IsReadOnly="False" CanUserResize="False"  Width="50"
+                                    IsReadOnly="False" CanUserResize="False"  Width="70"
                                     ElementStyle="{StaticResource dg_ElementStyle}"
                                     EditingElementStyle="{StaticResource TextCellEditingElementStyle}"     
                                     Binding="{Binding category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -142,7 +143,7 @@
                                     ElementStyle="{StaticResource dg_ElementStyle}"   HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"
                                     Binding="{Binding on_time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridCheckBoxColumn Header="周三检修" CanUserResize="False"  Width="70" 
+                <DataGridCheckBoxColumn Header="周三凌晨检修" CanUserResize="False"  Width="100" 
                                     ElementStyle="{StaticResource TuesdayCheckBoxStyle}"  HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CheckBoxEditingElementStyle}"
                                     Binding="{Binding stop_3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -155,7 +156,7 @@
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"
                                     Binding="{Binding on_time_3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <DataGridCheckBoxColumn Header="周二检修" CanUserResize="False"  Width="70" 
+                <DataGridCheckBoxColumn Header="周二下午检修" CanUserResize="False"  Width="100" 
                                     ElementStyle="{StaticResource TuesdayCheckBoxStyle}"  HeaderStyle="{StaticResource dg_HeaderStyle}"
                                     EditingElementStyle="{StaticResource CheckBoxEditingElementStyle}"
                                     Binding="{Binding stop_2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -177,13 +178,15 @@
 
 
 
-        <Button Content="刷新" Height="23" HorizontalAlignment="Left" Margin="375,373,0,0" Name="btnRefresh" VerticalAlignment="Top" Width="75" 
+        <Button Content="刷新" Height="23" HorizontalAlignment="Left" Margin="10,373,0,0" Name="btnRefresh" VerticalAlignment="Top" Width="75" 
                 Click="btnRefresh_Click" />
-        <Button Content="保存" Height="23" HorizontalAlignment="Left" Margin="556,373,0,0" Name="btnSave" VerticalAlignment="Top" Width="75" 
+        <Button Content="保存" Height="23" HorizontalAlignment="Left" Margin="530,373,0,0" Name="btnSave" VerticalAlignment="Top" Width="75" 
                 Click="btnSave_Click" />
-        <Button Content="添加" Height="23" HorizontalAlignment="Left" Margin="467,373,0,0" Name="btnAdd" VerticalAlignment="Top" Width="75" 
-                Click="btnAdd_Click"  />
-        <Button Content="删除" Height="23" HorizontalAlignment="Left" Margin="648,373,0,0" Name="btnDelete" VerticalAlignment="Top" Width="75" 
+        <Button Content="添加台站" Height="23" HorizontalAlignment="Left" Margin="194,373,0,0" Name="btnAddStation" VerticalAlignment="Top" Width="75" 
+                Click="btnAddStation_Click"  />
+        <Button Content="添加节目" Height="23" HorizontalAlignment="Left" Margin="298,373,0,0" Name="btnAddProgram" VerticalAlignment="Top" Width="75" 
+                Click="btnAddProgram_Click"  />
+        <Button Content="删除" Height="23" HorizontalAlignment="Left" Margin="407,373,0,0" Name="btnDelete" VerticalAlignment="Top" Width="75" 
                 Click="btnDelete_Click" RenderTransformOrigin="2.848,0.687"  />
 
         <Button Content="退出" Height="23" HorizontalAlignment="Left" Margin="738,373,0,0" Name="btnClosePopUp" VerticalAlignment="Top" Width="75" 

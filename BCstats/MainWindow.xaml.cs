@@ -59,13 +59,16 @@ namespace BCstats {
                 lblNow3.Content = dt.ToString();
                 #endregion
 
-                // 台站播出统计：读取city字段
-                getComboBoxBinding(cboxCity, sqliteHelper, BCstatsHelper.connectionString,
+                // 数据库和数据表都存在，才进行读取数据库操作
+                if (sqliteHelper.CheckDataBase(BCstatsHelper.dbFileName)
+                    && sqliteHelper.CheckDataTable(BCstatsHelper.connectionString, BCstatsHelper.tableName)) {
+                    // 台站播出统计：读取city字段
+                    getComboBoxBinding(cboxCity, sqliteHelper, BCstatsHelper.connectionString,
                     BCstatsHelper.STR_CITY, null, null, "InitializeComponent");
-                // 月播出时间统计：读取city字段
-                getComboBoxBinding(cbx_city, sqliteHelper, BCstatsHelper.connectionString,
+                    // 月播出时间统计：读取city字段
+                    getComboBoxBinding(cbx_city, sqliteHelper, BCstatsHelper.connectionString,
                     BCstatsHelper.STR_CITY, null, null, "InitializeComponent");
-
+                }
 
                 #region 台站播出统计 初始化
                 // 滚动条 ScrollBar 年、月
@@ -149,20 +152,23 @@ namespace BCstats {
                                         string whereName, string whereValue,
                                         string functionName) {
             try {
+                //lblDetail.Text = BCstatsHelper.connectionString;
                 // 先清除ComboBox下拉选项
                 cbox.Items.Clear();
+
+                string tableName = BCstatsHelper.tableName;
 
                 List<string> columnValueList = null;
                 //MessageBox.Show(sql);
                 // 城市、台站，有重复
                 if(columnName == BCstatsHelper.STR_CITY || columnName == BCstatsHelper.STR_STATION) {
                     // 获取数据表中某一列的所有不重复的值
-                    columnValueList = sqliteHelper.GetColunmDistinctValues(connectionString,
+                    columnValueList = sqliteHelper.GetColunmDistinctValues(connectionString, tableName,
                         columnName,
                         whereName, whereValue);
                 } else {
                     // 获取数据表中某一列所有的值
-                    columnValueList = sqliteHelper.GetColunmValues(connectionString,
+                    columnValueList = sqliteHelper.GetColunmValues(connectionString, tableName,
                         columnName,
                         whereName, whereValue);
                 }
@@ -282,7 +288,7 @@ namespace BCstats {
 
         #region TabItem3 台站播出统计 comboBox 下拉菜单 绑定数据库
         /// <summary>
-        /// 台站播出统计 下拉菜单：分中心，点击下拉的时候绑定
+        /// 台站播出统计 下拉菜单：地点，点击下拉的时候绑定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -296,7 +302,7 @@ namespace BCstats {
             }
         }
         /// <summary>
-        /// 台站播出统计 下拉菜单：分中心，选项改变的时候绑定
+        /// 台站播出统计 下拉菜单：地点，选项改变的时候绑定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -408,8 +414,7 @@ namespace BCstats {
                         // 最后一个周二不停机检修
                     }
 
-                    // 当月播出总时长
-                    Hours.Text = BCstatsHelper.TotalHoursOfTheMonth(
+                    Tuple<double, string> t = BCstatsHelper.TotalHoursOfTheMonth(
                                                    year, month,
                                                    Convert.ToInt32(scbNoStop2.Value),
                                                    Convert.ToInt32(scbNoStop3.Value),
@@ -423,8 +428,12 @@ namespace BCstats {
                                                    stop2,
                                                    off_time_2_hour, off_time_2_min,
                                                    on_time_2_hour, on_time_2_min,
-                                                   stopLast2).ToString();
+                                                   stopLast2);
 
+                    // 当月播出总时长
+                    Hours.Text = t.Item1.ToString();
+                    // 详细过程
+                    lblDetail.Text = t.Item2;
                 } else {
                     Hours.Text = "0";
                 }
@@ -661,11 +670,11 @@ namespace BCstats {
                     stop3 = false;
                 }
                 // 周三停播
-                off_time_3_hour = Convert.ToDouble(offHour3.Text);
-                off_time_3_min = Convert.ToDouble(offMin3.Text);
+                off_time_3_hour = Convert.ToDouble(wtbxOffHour3.Text);
+                off_time_3_min = Convert.ToDouble(wtbxOffMin3.Text);
                 // 周三播出
-                on_time_3_hour = Convert.ToDouble(onHour3.Text);
-                on_time_3_min = Convert.ToDouble(onMin3.Text);
+                on_time_3_hour = Convert.ToDouble(wtbxOnHour3.Text);
+                on_time_3_min = Convert.ToDouble(wtbxOnMin3.Text);
 
                 // 周二是否停机检修
                 if ((bool)chkBox_Tuesday.IsChecked) {
@@ -710,8 +719,7 @@ namespace BCstats {
                     nonStop3 = Convert.ToInt16(scb_NoStop3.Value);
                 }
 
-                // 当月播出总时长
-                tbxTotalHours.Text = BCstatsHelper.TotalHoursOfTheMonth(
+                Tuple<double, string> t = BCstatsHelper.TotalHoursOfTheMonth(
                                                    year, month,
                                                    nonStop2, nonStop3,
                                                    off_time_hour, off_time_min,
@@ -723,7 +731,12 @@ namespace BCstats {
                                                    off_time_2_hour, off_time_2_min,
                                                    on_time_2_hour, on_time_2_min,
                                                    stopLast2
-                                                   ).ToString();
+                                                   );
+
+                // 当月播出总时长
+                tbxTotalHours.Text = t.Item1.ToString();
+                // 详细过程
+                lblDetail.Text = t.Item2;
             } catch (Exception ex) {
                 tbxTotalHours.Text = "0";
                 MessageBox.Show("输入的内容有误：" + ex.ToString());
@@ -781,7 +794,7 @@ namespace BCstats {
         }
 
         /// <summary>
-        /// 月播出时间统计：下拉菜单 分中心 
+        /// 月播出时间统计：下拉菜单 地点 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -795,7 +808,7 @@ namespace BCstats {
             }
         }
         /// <summary>
-        /// 月播出时间统计：下拉菜单 分中心 
+        /// 月播出时间统计：下拉菜单 地点 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -850,26 +863,26 @@ namespace BCstats {
 
                     // 周三是否停机检修
                     int stop_3 = sqliteHelper.GetIntValue(city, station, frequency,
-                        BCstatsHelper.STR_STOP_2);
+                        BCstatsHelper.STR_STOP_3);
                     if (stop_3 == 1) {
-                        chkBox_Tuesday.IsChecked = true;
+                        chkBox_Wednesday.IsChecked = true;
                     } else {
-                        chkBox_Tuesday.IsChecked = false;
-                        wtbxOffHour2.Text = "0";
-                        wtbxOffMin2.Text = "0";
-                        wtbxOnHour2.Text = "0";
-                        wtbxOnMin2.Text = "0";
+                        chkBox_Wednesday.IsChecked = false;
+                        wtbxOffHour3.Text = "0";
+                        wtbxOffMin3.Text = "0";
+                        wtbxOnHour3.Text = "0";
+                        wtbxOnMin3.Text = "0";
                     }
                     // 周三停播
                     string off_time_3_Text = BCstatsHelper.STR_OFF_TIME_3;
                     string off_time_3 = sqliteHelper.GetTimeValue(city, station, frequency, off_time_3_Text);
-                    offHour3.Text = off_time_3.Substring(0, 2);
-                    offMin3.Text = off_time_3.Substring(2, 2);
+                    wtbxOffHour3.Text = off_time_3.Substring(0, 2);
+                    wtbxOffMin3.Text = off_time_3.Substring(2, 2);
                     // 周三播出
                     string on_time_3_Text = BCstatsHelper.STR_ON_TIME_3;
                     string on_time_3 = sqliteHelper.GetTimeValue(city, station, frequency, on_time_3_Text);
-                    onHour3.Text = on_time_3.Substring(0, 2);
-                    onMin3.Text = on_time_3.Substring(2, 2);
+                    wtbxOnHour3.Text = on_time_3.Substring(0, 2);
+                    wtbxOnMin3.Text = on_time_3.Substring(2, 2);
 
                     // 周二是否停机检修
                     int stop_2 = sqliteHelper.GetIntValue(city, station, frequency, 
@@ -893,6 +906,7 @@ namespace BCstats {
                         chkBox_LastTuesday.IsChecked = false;
                     }
                 } else {
+                    ;
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.ToString());
@@ -946,17 +960,59 @@ namespace BCstats {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void chkBox_LastTuesday_Checked(object sender, RoutedEventArgs e) {
+            wtbxOffHour2.Text = "13";
+            wtbxOffMin2.Text = "00";
+            wtbxOnHour2.Text = "17";
+            wtbxOnMin2.Text = "30";
+            // 可以编辑检修时间
+            wtbxOffHour2.IsEnabled = true;
+            wtbxOffMin2.IsEnabled = true;
+            wtbxOnHour2.IsEnabled = true;
+            wtbxOnMin2.IsEnabled = true;
 
+            wtbxOffHour2.IsReadOnly = false;
+            wtbxOffMin2.IsReadOnly = false;
+            wtbxOnHour2.IsReadOnly = false;
+            wtbxOnMin2.IsReadOnly = false;
         }
         private void chkBox_LastTuesday_Unchecked(object sender, RoutedEventArgs e) {
 
         }
 
+        /// <summary>
+        /// 月播出时间统计：单选框 周三凌晨是否停机检修
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void chkBox_Wednesday_Checked(object sender, RoutedEventArgs e) {
+            wtbxOffHour3.Text = "01";
+            wtbxOffMin3.Text = "00";
+            wtbxOnHour3.Text = "06";
+            wtbxOnMin3.Text = "00";
+            // 可以编辑检修时间
+            wtbxOffHour3.IsEnabled = true;
+            wtbxOffMin3.IsEnabled = true;
+            wtbxOnHour3.IsEnabled = true;
+            wtbxOnMin3.IsEnabled = true;
 
+            wtbxOffHour3.IsReadOnly = false;
+            wtbxOffMin3.IsReadOnly = false;
+            wtbxOnHour3.IsReadOnly = false;
+            wtbxOnMin3.IsReadOnly = false;
+        }
+        private void chkBox_Wednesday_Unchecked(object sender, RoutedEventArgs e) {
+            wtbxOffHour3.Text = "0";
+            wtbxOffMin3.Text = "0";
+            wtbxOnHour3.Text = "0";
+            wtbxOnMin3.Text = "0";
 
+            // 只读，不可编辑
+            wtbxOffHour3.IsReadOnly = true;
+            wtbxOffMin3.IsReadOnly = true;
+            wtbxOnHour3.IsReadOnly = true;
+            wtbxOnMin3.IsReadOnly = true;
+        }
 
-        
-        
         #endregion
 
 

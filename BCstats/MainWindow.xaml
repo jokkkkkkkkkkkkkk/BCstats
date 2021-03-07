@@ -280,7 +280,7 @@
 
                 <Button Content="频率时间表设置" Height="40" HorizontalAlignment="Left" Margin="460,238,0,0" 
                         Name="btnPopup_TimeTable" VerticalAlignment="Top" Width="120" Click="btnPopup_TimeTable_Click" RenderTransformOrigin="0.537,0.527" />
-                <RadioButton Name="rbtnLastTuesday" Content="当月最后一个周二停机检修"
+                <RadioButton Name="rbtnLastTuesday" Content="当月最后的周二停机检修"
                              FontSize="18" Width="Auto" Height="Auto"
                              HorizontalAlignment="Left" Margin="32,256,0,0" VerticalAlignment="Top" 
                              HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
@@ -291,10 +291,16 @@
                        HorizontalAlignment="Left" Margin="285,182,0,0" VerticalAlignment="Top"
                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
 
-                <Button x:Name="btnPopUp_StationStats" Content="台站当月播出时长"  Width="160" Height="50"
+                <Button x:Name="btnPopUp_StationStats" Content="台站当月播出统计"  Width="160" Height="50"
                         FontSize="18" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         HorizontalAlignment="Left" Margin="420,310,0,0" VerticalAlignment="Top" 
                         Click="btnPopUp_StationStats_Click"/>
+                <TextBlock x:Name="lblDetail" Margin="31,299,0,0" Text="" TextWrapping="Wrap"
+                       HorizontalAlignment="Left"  VerticalAlignment="Top" Height="80" Width="188">
+                </TextBlock>
+
+
+
 
             </Grid>
         </TabItem>
@@ -540,10 +546,10 @@
                          Grid.Column="1">
                 </TextBox>
 
-                <CheckBox Content="周二停机检修时间" FontSize="16" Height="Auto" Width="Auto" Name="chkBox_Tuesday" Margin="360.8,36,0,0"
+                <CheckBox Content="周二下午停机检修时间" FontSize="16" Height="Auto" Width="Auto" Name="chkBox_Tuesday" Margin="360.8,36,0,0"
                           HorizontalAlignment="Left" HorizontalContentAlignment="Center"  VerticalAlignment="Top" VerticalContentAlignment="Center"
                           Checked="chkBox_Tuesday_Checked" Unchecked="chkBox_Tuesday_UnChecked" Grid.Column="1"/>
-                <Label Content="分中心：" Height="28" HorizontalAlignment="Left" Margin="16,284,0,0" Name="label37" VerticalAlignment="Top" Grid.ColumnSpan="2" />
+                <Label Content="地点：" Height="28" Width="Auto" HorizontalAlignment="Left" Margin="26,284,0,0" Name="label37" VerticalAlignment="Top" Grid.ColumnSpan="2" />
 
                 <ComboBox Height="25" HorizontalAlignment="Left" Margin="41.4,287,0,0" 
                       Name="cbx_city" VerticalAlignment="Top" Width="105"  Grid.Column="1" 
@@ -551,7 +557,7 @@
                           PreviewMouseWheel="cbx_city_PreviewMouseWheel"/>
 
 
-                <Label Content="台站：" Height="28" HorizontalAlignment="Left" Margin="163.4,285,0,0" Name="label38" VerticalAlignment="Top" Grid.Column="1" />
+                <Label Content="台站：" Height="28" Width="Auto" HorizontalAlignment="Left" Margin="163.4,285,0,0" Name="label38" VerticalAlignment="Top" Grid.Column="1" />
                 <ComboBox Height="25" HorizontalAlignment="Left" Margin="217.4,288,0,0" Name="cbx_station" VerticalAlignment="Top" Width="100" Grid.Column="1" 
                           DropDownClosed="cbx_station_DropDownClosed" PreviewMouseWheel="cbx_station_PreviewMouseWheel"/>
 
@@ -570,16 +576,16 @@
                     x:Name="chkBox_LastTuesday" Margin="360.8,130,0,0" Height="Auto" Width="180"
                     FontSize="16" Checked="chkBox_LastTuesday_Checked" Unchecked="chkBox_LastTuesday_Unchecked" Grid.Column="1" />
 
-                <CheckBox Content="周三停机检修时间" FontSize="16" Height="Auto" Width="Auto" 
+                <CheckBox Content="周三凌晨停机检修时间" FontSize="16" Height="Auto" Width="Auto" 
                     x:Name="chkBox_Wednesday" Margin="360.8,183,0,0"
                     HorizontalAlignment="Left" HorizontalContentAlignment="Center"  
                     VerticalAlignment="Top" VerticalContentAlignment="Center"
-                          
+                    Checked="chkBox_Wednesday_Checked" Unchecked="chkBox_Wednesday_Unchecked"
                     Grid.Column="1"/>
-                
-                
+
+
                 <xctk:WatermarkTextBox 
-                    Height="30" Width="55" Name="offHour3" 
+                    Height="30" Width="55" Name="wtbxOffHour3" 
                     HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="378.8,208,0,0"
                     VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
                     
@@ -593,7 +599,7 @@
 
                 </xctk:WatermarkTextBox>
                 <xctk:WatermarkTextBox 
-                    Height="30" Width="55" Name="offMin3" 
+                    Height="30" Width="55" Name="wtbxOffMin3" 
                     HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="453.8,208,0,0"
                     VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
                     
@@ -607,7 +613,7 @@
 
                 </xctk:WatermarkTextBox>
                 <xctk:WatermarkTextBox 
-                    Height="30" Width="55" Name="onHour3" 
+                    Height="30" Width="55" Name="wtbxOnHour3" 
                     HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="378.8,243,0,0"
                     VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
                     
@@ -621,7 +627,7 @@
 
                 </xctk:WatermarkTextBox>
                 <xctk:WatermarkTextBox 
-                    Height="30" Width="55" Name="onMin3" 
+                    Height="30" Width="55" Name="wtbxOnMin3" 
                     HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="453.8,243,0,0"
                     VerticalContentAlignment="Center" MinHeight="30" MaxHeight="30" MinWidth="55" MaxWidth="55" 
                     
@@ -635,7 +641,7 @@
 
                 </xctk:WatermarkTextBox>
                 <Label Content="至：" FontSize="16" Height="30" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="343.8,243,0,0" x:Name="label23_Copy" VerticalAlignment="Top" Grid.Column="1"/>
-                
+
 
             </Grid>
         </TabItem>

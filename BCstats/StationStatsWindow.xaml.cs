@@ -39,9 +39,13 @@ namespace BCstats {
             // 获取主窗口的控件状态信息
             MainWindow mw = Application.Current.Windows[0] as MainWindow;
             DataTable dt = new DataTable();
-            if (mw.cboxCity.SelectedIndex != -1
-                && mw.cboxStation.SelectedIndex != -1) {
 
+            if (mw.cboxCity.SelectedIndex != -1
+                && mw.cboxStation.SelectedIndex != -1
+                && sqliteHelper.CheckDataBase(BCstatsHelper.dbFileName)
+                && sqliteHelper.CheckDataTable(BCstatsHelper.connectionString, BCstatsHelper.tableName)) {
+
+                #region 读写控件状态
                 int year = Convert.ToInt32(mw.scbYear.Value);
                 int month = Convert.ToInt32(mw.scbMonth.Value);
 
@@ -55,21 +59,25 @@ namespace BCstats {
 
                 string city = mw.cboxCity.Text;
                 string station = mw.cboxStation.Text;
+                #endregion
 
+                #region 读取数据库，生成 DataTable 到 DataGrid
                 // 台站的所有节目数量，各种类型的节目数量
-                int total = sqliteHelper.GetDataCount(BCstatsHelper.connectionString,
+                int total = sqliteHelper.GetDataCounBy(BCstatsHelper.connectionString, BCstatsHelper.tableName,
                     BCstatsHelper.STR_STATION, station);
 
+                string tableName = BCstatsHelper.tableName;
+
                 // 列表：节目类型
-                List<string> categoryList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString,
+                List<string> categoryList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString, tableName,
                     BCstatsHelper.STR_CATEGORY,
                     BCstatsHelper.STR_STATION, station);
                 // 列表：节目名称
-                List<string> nameList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString,
+                List<string> nameList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString, tableName,
                     BCstatsHelper.STR_NAME,
                     BCstatsHelper.STR_STATION, station);
                 // 列表：节目频率
-                List<string> frequencyList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString,
+                List<string> frequencyList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString, tableName,
                     BCstatsHelper.STR_FREQUENCY,
                     BCstatsHelper.STR_STATION, station);
                 // DataTable 定义列
@@ -99,18 +107,14 @@ namespace BCstats {
                 StationStats_DataGrid.CanUserDeleteRows = false;
                 StationStats_DataGrid.CanUserAddRows = false;
                 StationStats_DataGrid.CanUserSortColumns = true;
-                // 各个类型的播出时长之和
+                #endregion
+
+                #region 各个类型的播出时长之和
                 double swHours = GetHoursByCategory(dt, BCstatsHelper.STR_SW);
                 double mwHours = GetHoursByCategory(dt, BCstatsHelper.STR_MW);
                 double fmHours = GetHoursByCategory(dt, BCstatsHelper.STR_FM);
                 double tvHours = GetHoursByCategory(dt, BCstatsHelper.STR_TV);
 
-                // 台站当月所有节目的总播出时长
-                //ArrayList hoursList = new ArrayList();
-                //for (int i = 0; i < qty; i++) {
-                //    hoursList.Add(Convert.ToDouble(dt.Rows[i][BCstatsHelper.STR_HOURS]));
-                //}
-                //double sumHours = hoursList.Cast<double>().Sum();
                 double sumHours = swHours + mwHours + fmHours + tvHours;
 
                 int swQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_SW);
@@ -127,7 +131,9 @@ namespace BCstats {
                 tbxFM.Text = fmHours.ToString();
                 tbxDTV.Text = tvHours.ToString();
                 tbxAllHours.Text = sumHours.ToString();
+                #endregion
             }
+        
         }
 
 
@@ -211,8 +217,7 @@ namespace BCstats {
                     // 最后一个周二不停机检修
                 }
 
-                // 当月播出总时长
-                return BCstatsHelper.TotalHoursOfTheMonth(
+                Tuple<double, string> t = BCstatsHelper.TotalHoursOfTheMonth(
                                                 year, month,
                                                 nostop2, nostop3,
                                                 off_time_hour, off_time_min,
@@ -223,7 +228,10 @@ namespace BCstats {
                                                 stop2,
                                                 off_time_2_hour, off_time_2_min,
                                                 on_time_2_hour, on_time_2_min,
-                                                stopLast2).ToString();
+                                                stopLast2);
+
+                // 当月播出总时长
+                return t.Item1.ToString();
             } catch {
                 return "0";
             }
