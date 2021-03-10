@@ -109,7 +109,7 @@
                                     ElementStyle="{StaticResource dg_ElementStyle}"  
                                     EditingElementStyle="{StaticResource CellEditingElementStyle}"                                                      
                                     Binding="{Binding id, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="城市"   HeaderStyle="{StaticResource dg_HeaderStyle}" 
+                <DataGridTextColumn Header="地点"   HeaderStyle="{StaticResource dg_HeaderStyle}" 
                                     IsReadOnly="False" CanUserResize="False" Width="60"
                                     ElementStyle="{StaticResource dg_ElementStyle}"    
                                     EditingElementStyle="{StaticResource TextCellEditingElementStyle}"
@@ -176,20 +176,36 @@
             </DataGrid.Columns>
         </DataGrid>
 
+        <Label x:Name="ttw_lblCity" Content="地点：" FontSize="16" HorizontalAlignment="Left" Margin="20,367,0,0" VerticalAlignment="Top"/>
+
+        <Label x:Name="ttw_lblStation" Content="台站：" FontSize="16"  HorizontalAlignment="Left" Margin="228,366,0,0" VerticalAlignment="Top"/>
+
+        <ComboBox Height="30" HorizontalAlignment="Left" Margin="83,366,0,0" VerticalAlignment="Top" Width="100" 
+            x:Name="ttw_cboxCity"  VerticalContentAlignment="Center" HorizontalContentAlignment="Left"
+            FontSize="16"      
+            PreviewMouseWheel="comboBox_PreviewMouseWheel"
+            SelectionChanged="ttw_cboxCity_SelectionChanged"  DropDownClosed="ttw_cboxCity_DropDownClosed" />
+
+        <ComboBox Height="30" Width="140" x:Name="ttw_cboxStation" Margin="291,366,0,0"
+            HorizontalAlignment="Left" VerticalAlignment="Top" 
+            HorizontalContentAlignment="Left" VerticalContentAlignment="Center" 
+
+            FontSize="16"
+            PreviewMouseWheel="comboBox_PreviewMouseWheel" 
+            SelectionChanged="ttw_cboxStation_SelectionChanged" DropDownClosed="ttw_cboxStation_DropDownClosed" />
 
 
-        <Button Content="刷新" Height="23" HorizontalAlignment="Left" Margin="10,373,0,0" Name="btnRefresh" VerticalAlignment="Top" Width="75" 
+
+        <Button Content="刷新" Height="23" HorizontalAlignment="Left" Margin="860,373,0,0" Name="btnRefresh" VerticalAlignment="Top" Width="75" 
                 Click="btnRefresh_Click" />
-        <Button Content="保存" Height="23" HorizontalAlignment="Left" Margin="530,373,0,0" Name="btnSave" VerticalAlignment="Top" Width="75" 
+        <Button Content="保存" Height="23" HorizontalAlignment="Left" Margin="1095,373,0,0" Name="btnSave" VerticalAlignment="Top" Width="75" 
                 Click="btnSave_Click" />
-        <Button Content="添加台站" Height="23" HorizontalAlignment="Left" Margin="194,373,0,0" Name="btnAddStation" VerticalAlignment="Top" Width="75" 
-                Click="btnAddStation_Click"  />
-        <Button Content="添加节目" Height="23" HorizontalAlignment="Left" Margin="298,373,0,0" Name="btnAddProgram" VerticalAlignment="Top" Width="75" 
+        <Button Content="添加节目" Height="23" HorizontalAlignment="Left" Margin="940,373,0,0" Name="btnAddProgram" VerticalAlignment="Top" Width="75" 
                 Click="btnAddProgram_Click"  />
-        <Button Content="删除" Height="23" HorizontalAlignment="Left" Margin="407,373,0,0" Name="btnDelete" VerticalAlignment="Top" Width="75" 
-                Click="btnDelete_Click" RenderTransformOrigin="2.848,0.687"  />
+        <Button Content="删除" Height="23" HorizontalAlignment="Left" Margin="1015,373,0,0" Name="btnDelete" VerticalAlignment="Top" Width="75" 
+                Click="btnDelete_Click" RenderTransformOrigin="1.44,0.661"  />
 
-        <Button Content="退出" Height="23" HorizontalAlignment="Left" Margin="738,373,0,0" Name="btnClosePopUp" VerticalAlignment="Top" Width="75" 
+        <Button Content="退出" Height="23" HorizontalAlignment="Left" Margin="1175,373,0,0" Name="btnClosePopUp" VerticalAlignment="Top" Width="75" 
                 Click="btnClosePopUp_Click"  />
     </Grid>
 </Window>

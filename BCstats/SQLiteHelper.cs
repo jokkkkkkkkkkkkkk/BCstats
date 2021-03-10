@@ -5,8 +5,9 @@ using System.Data;
 using System.Windows;
 using System.Collections;
 using System.IO;
+using System.Linq;
 
-class SQLiteHelper {
+public class SQLiteHelper {
 
     /// <summary>
     /// 数据库连接定义
@@ -168,23 +169,36 @@ class SQLiteHelper {
     /// <returns>The values.</returns>
     /// <param name="tableName">数据表名称</param>
     /// <param name="values">插入的数值</param>
-    public SQLiteDataReader InsertValues(string tableName, ArrayList arr) {
-        string queryString = "INSERT INTO " + tableName + " VALUES (" + "'" + arr[0] + "'";
-        for (int i = 1; i < arr.Count; i++) {
-            queryString += ", " + "'" + arr[i] + "'";
+    public SQLiteDataReader InsertValues(string tableName, 
+        ArrayList columnNamessArr, ArrayList valuesArr) {
+        // ArrayList to string
+        string colStr = null;
+        string valueStr = null;
+
+        // 去掉ID列，让其自动生成ID
+        columnNamessArr.RemoveAt(0);
+        colStr = String.Join(", ", columnNamessArr.Cast<string>().ToArray());
+        // 转换成功
+        //Console.WriteLine("colStr: \n" + colStr);
+
+        valueStr = "'" + valuesArr[0].ToString();
+        for(int i = 1; i < valuesArr.Count; i++) {
+            if(valuesArr[i].GetType() != typeof(int)) {
+                valueStr += "' , '" + valuesArr[i];
+            } else {
+                valueStr += " , " + valuesArr[i];
+            }
         }
-        queryString += " )";
-        //MessageBox.Show("insert sql: " + queryString);
+        valueStr += "'";
+        // 转换成功
+        //Console.WriteLine("valueStr: \n" + valueStr);
+
+        string queryString  = null;
+        queryString = string.Format("INSERT INTO {0}({1}) VALUES({2})", tableName, colStr, valueStr);
+        //Console.WriteLine("INSERT SQL: \n" + queryString);
         //return null;
         return ExecuteQuery(queryString);
     }
-
-
-
-
-
-
-
 
 
     /// <summary>
@@ -214,7 +228,7 @@ class SQLiteHelper {
         }
         //queryString += " WHERE " + key + operation + "'" + value + "'";
         queryString += " WHERE " + key + operation + value;
-        Console.WriteLine("queryString : " + queryString);
+        //Console.WriteLine("queryString : " + queryString);
         return ExecuteQuery(queryString);
     }
 
@@ -569,7 +583,7 @@ class SQLiteHelper {
     /// 打印数组ArrayList
     /// </summary>
     /// <param name="arr"></param>
-    public void PrintArray(ArrayList arr) {
+    public void PrintArrayList(ArrayList arr) {
         string str = "[";
         for (int i = 0; i < arr.Count; i++) {
             str += arr[i].ToString();
@@ -580,6 +594,7 @@ class SQLiteHelper {
         str += "]";
         Console.WriteLine(str);
     }
+
 
 
     /// <summary>

@@ -160,7 +160,7 @@ namespace BCstats {
 
                 List<string> columnValueList = null;
                 //MessageBox.Show(sql);
-                // 城市、台站，有重复
+                // 地点、台站，有重复
                 if(columnName == BCstatsHelper.STR_CITY || columnName == BCstatsHelper.STR_STATION) {
                     // 获取数据表中某一列的所有不重复的值
                     columnValueList = sqliteHelper.GetColunmDistinctValues(connectionString, tableName,
@@ -1018,22 +1018,7 @@ namespace BCstats {
 
 
         #region 所有的下拉菜单 事件 禁止鼠标滚轮
-        private void cboxCity_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
-            e.Handled = true;
-        }
-        private void cboxStation_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
-            e.Handled = true;
-        }
-        private void cboxFrequency_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
-            e.Handled = true;
-        }
-        private void cbx_city_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
-            e.Handled = true;
-        }
-        private void cbx_station_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
-            e.Handled = true;
-        }
-        private void cbx_frequency_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
+        public void comboBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
             e.Handled = true;
         }
         #endregion

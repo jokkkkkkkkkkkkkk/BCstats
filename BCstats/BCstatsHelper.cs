@@ -28,6 +28,7 @@ public sealed class BCstatsHelper {
 
     public const string STR_CITY_CH = "地点";
     public const string STR_STATION_CH = "台站";
+    public const string STR_STATION_CH_FOR_SHORT = "台";
     public const string STR_FREQUENCY_CH = "Hz";
 
     public const string STR_OFF_TIME = "off_time";

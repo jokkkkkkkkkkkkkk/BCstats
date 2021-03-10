@@ -212,20 +212,20 @@
 
                 <ComboBox Height="30" HorizontalAlignment="Left" Margin="29,106,0,0" VerticalAlignment="Top" Width="80" 
                           Name="cboxCity"  VerticalContentAlignment="Center" HorizontalContentAlignment="Left"
-                          PreviewMouseWheel="cboxCity_PreviewMouseWheel"
+                          PreviewMouseWheel="comboBox_PreviewMouseWheel"
                           SelectionChanged="cboxCity_SelectionChanged" DropDownClosed="cboxCity_DropDownClosed"/>
 
 
                 <ComboBox Height="30" HorizontalAlignment="Left" Margin="155,106,0,0" HorizontalContentAlignment="Left"
                           Name="cboxStation" VerticalAlignment="Top" Width="140" VerticalContentAlignment="Center"
-                          DropDownClosed="cboxStation_DropDownClosed" PreviewMouseWheel="cboxStation_PreviewMouseWheel" 
+                          DropDownClosed="cboxStation_DropDownClosed" PreviewMouseWheel="comboBox_PreviewMouseWheel" 
                           RenderTransformOrigin="0.034,0.505" />
 
                 <ComboBox Height="30" HorizontalAlignment="Left" Margin="330,106,0,0" HorizontalContentAlignment="Left"
                           x:Name="cboxFrequency" x:FieldModifier="public"
                           VerticalAlignment="Top" Width="250" VerticalContentAlignment="Center"
                           DropDownClosed="cboxFrequency_DropDownClosed" 
-                          PreviewMouseWheel="cboxFrequency_PreviewMouseWheel"/>
+                          PreviewMouseWheel="comboBox_PreviewMouseWheel"/>
 
 
 
@@ -554,16 +554,16 @@
                 <ComboBox Height="25" HorizontalAlignment="Left" Margin="41.4,287,0,0" 
                       Name="cbx_city" VerticalAlignment="Top" Width="105"  Grid.Column="1" 
                           SelectionChanged="cbx_city_SelectionChanged" DropDownClosed="cbx_city_DropDownClosed" 
-                          PreviewMouseWheel="cbx_city_PreviewMouseWheel"/>
+                          PreviewMouseWheel="comboBox_PreviewMouseWheel"/>
 
 
                 <Label Content="台站：" Height="28" Width="Auto" HorizontalAlignment="Left" Margin="163.4,285,0,0" Name="label38" VerticalAlignment="Top" Grid.Column="1" />
                 <ComboBox Height="25" HorizontalAlignment="Left" Margin="217.4,288,0,0" Name="cbx_station" VerticalAlignment="Top" Width="100" Grid.Column="1" 
-                          DropDownClosed="cbx_station_DropDownClosed" PreviewMouseWheel="cbx_station_PreviewMouseWheel"/>
+                          DropDownClosed="cbx_station_DropDownClosed" PreviewMouseWheel="comboBox_PreviewMouseWheel"/>
 
                 <Label Content="频率：" Height="28" HorizontalAlignment="Left" Margin="331.4,284,0,0" Name="label39" VerticalAlignment="Top" Grid.Column="1" />
                 <ComboBox Height="25" Margin="385.4,289,0,0" Name="cbx_frequency" VerticalAlignment="Top" 
-                          DropDownClosed="cbx_frequency_DropDownClosed" HorizontalAlignment="Left" Width="150" Grid.Column="1" PreviewMouseWheel="cbx_frequency_PreviewMouseWheel" />
+                          DropDownClosed="cbx_frequency_DropDownClosed" HorizontalAlignment="Left" Width="150" Grid.Column="1" PreviewMouseWheel="comboBox_PreviewMouseWheel" />
 
 
                 <Button Content="退出" Height="30" FontSize="16" HorizontalAlignment="Right" Margin="0,0,10,11" x:Name="btnQuit_Tab01" VerticalAlignment="Bottom" Width="75" Click="btnQuit_Click" Grid.Column="1" />
