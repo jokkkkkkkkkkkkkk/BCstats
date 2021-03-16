@@ -203,11 +203,13 @@ namespace BCstats {
                 if (ttw_cboxStation.SelectedIndex != -1) {
                     // 在datatable新增了数据条目
                     if (dt.Rows.Count > programsCount) {
-                        // 执行插入语句的次数，即比较后多出的行数
                         for (int i = 1; i <= dt.Rows.Count - programsCount; i++) {
+                            ArrayList arr = BCstatsHelper.getTheRowValues(dt, dt.Rows.Count - i);
+                            // 去掉ID列的值，让其自动生成
+                            arr.RemoveAt(0);
                             //Console.WriteLine("预备插入的数据：");
-                            sqlHelper.InsertValues(BCstatsHelper.tableName, BCstatsHelper.getColumnNames(dt),
-                                BCstatsHelper.getTheRowValues(dt, dt.Rows.Count - i));
+                            sqlHelper.InsertValues(BCstatsHelper.tableName, 
+                                BCstatsHelper.getColumnNames(dt), arr);
                         }
                     } else if (dt.Rows.Count == programsCount) {
                         //Console.WriteLine("Grid DataTable 总条数/总行数: " + dt.Rows.Count);

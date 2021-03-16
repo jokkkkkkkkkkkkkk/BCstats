@@ -195,7 +195,7 @@ public class SQLiteHelper {
 
         string queryString  = null;
         queryString = string.Format("INSERT INTO {0}({1}) VALUES({2})", tableName, colStr, valueStr);
-        //Console.WriteLine("INSERT SQL: \n" + queryString);
+        Console.WriteLine("INSERT SQL: \n" + queryString);
         //return null;
         return ExecuteQuery(queryString);
     }
@@ -228,7 +228,7 @@ public class SQLiteHelper {
         }
         //queryString += " WHERE " + key + operation + "'" + value + "'";
         queryString += " WHERE " + key + operation + value;
-        //Console.WriteLine("queryString : " + queryString);
+        Console.WriteLine("UPDATE SQL: \n" + queryString);
         return ExecuteQuery(queryString);
     }
 
