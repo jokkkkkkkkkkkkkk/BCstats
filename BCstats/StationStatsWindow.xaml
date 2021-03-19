@@ -8,7 +8,7 @@
         ResizeMode="NoResize"
         Name="ssWindow"
         Title="台站播出数据" 
-        Height="500" Width="500"
+        Height="500" Width="580"
         Icon="/BCstats;component/radio.ico"
         Loaded="StationStatsWindow_Loaded">
 
@@ -30,13 +30,15 @@
                   AlternatingRowBackground="#e9e9e9"
                   RowStyle="{StaticResource DataGridRowStyle_StationStats}"   
                   CellStyle="{StaticResource DataGridCellReadOnlyStyle}" 
-                  >
+                  
+                  MaxWidth="430">
             <DataGrid.Columns>
 
                 <DataGridTextColumn Header="类型"     HeaderStyle="{StaticResource dg_BigHeaderStyle}"   
-                                    IsReadOnly="True" CanUserResize="False" Width="*" 
+                                    IsReadOnly="True" CanUserResize="False" Width="80" 
                                     Binding="{Binding category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                     ElementStyle="{StaticResource dg_ElementStyle}"/>
+
                 <DataGridTextColumn Header="名称"     HeaderStyle="{StaticResource dg_BigHeaderStyle}"   
                                     IsReadOnly="True" CanUserResize="False" Width="100" 
                                     Binding="{Binding name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -48,52 +50,46 @@
                                     ElementStyle="{StaticResource dg_ElementStyle}"/>
 
                 <DataGridTextColumn Header="当月播出时长" HeaderStyle="{StaticResource dg_BigHeaderStyle}" 
-                                    IsReadOnly="True" CanUserResize="False" Width="100" 
+                                    IsReadOnly="True" CanUserResize="False" Width="*" 
                                     Binding="{Binding hours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                     ElementStyle="{StaticResource dg_ElementStyle}"/>
             </DataGrid.Columns>
         </DataGrid>
 
 
-        <Button x:Name="btn_ss_refresh" Height="30" Content="刷新" FontSize="16" HorizontalAlignment="Left" Margin="10,0,0,5" VerticalAlignment="Bottom" Width="75" 
+        <Button x:Name="btn_ss_refresh" Height="30" Content="刷新" FontSize="16" HorizontalAlignment="Left" Margin="17,0,0,10" VerticalAlignment="Bottom" Width="75" 
                 Click="btn_ss_refresh_Click" RenderTransformOrigin="0.44,1.063"/>
-        <Button x:Name="btn_ss_quit" Height="30" Content="关闭" FontSize="16" HorizontalAlignment="Right" Margin="0,0,0,5" VerticalAlignment="Bottom" Width="75" 
-                Click="btn_ss_quit_Click"/>
+        <Button x:Name="btn_ss_quit" Height="30" Content="关闭" FontSize="16" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75" 
+                Click="btn_ss_quit_Click" RenderTransformOrigin="0.425,0.316"/>
 
-        <Label x:Name="lblSW" Content="短波" Margin="406,20,0,0" Height="30" Width="60"
-            FontSize="16"
+        <Label x:Name="lblSW" Content="短波" Margin="469,11,0,0" Style="{StaticResource ssw_LabelStyle}"/>
+        <Label x:Name="lblMW" Content="中波" Margin="469,80,0,0" Style="{StaticResource ssw_LabelStyle}" />
+        <Label x:Name="lblEXP" Content="实验" Margin="469,150,0,0" Style="{StaticResource ssw_LabelStyle}" />
+        <Label x:Name="lblFM" Content="调频" Margin="469,220,0,0" Style="{StaticResource ssw_LabelStyle}" />
+        <Label x:Name="lblDTV" Content="数字电视" Margin="467,290,3,0" Style="{StaticResource ssw_LabelStyle}" 
+               Width="100" HorizontalContentAlignment="Left"/>
+        <Label x:Name="lblAllHours" Content="总    计" Margin="0,367,10,0" Height="30" Width="90"
+            FontSize="18" FontFamily="Arial" FontWeight="Bold"
             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-            HorizontalAlignment="Left"  VerticalAlignment="Top" />
-        <Label x:Name="lblMW" Content="中波" Margin="406,90,0,0" Height="30" Width="60"
-            FontSize="16"
-            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-            HorizontalAlignment="Left"  VerticalAlignment="Top" />
-        <Label x:Name="lblFM" Content="调频" Margin="406,160,0,0" Height="30" Width="60"
-            FontSize="16"
-            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-               
-            HorizontalAlignment="Left"  VerticalAlignment="Top" />
-        <Label x:Name="lblDTV" Margin="406,240,0,0" Height="80" Width="60"
-            FontSize="16" 
-            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-            HorizontalAlignment="Left"  VerticalAlignment="Top" >
-            <TextBlock Name="tbDTV" Text="数字电视" TextWrapping="Wrap" Width="34"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Label>
-        
-        <Label x:Name="lblAllHours" Content="总计" Margin="406,361,0,0" Height="30" Width="70"
-            FontSize="16"
-            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-            HorizontalAlignment="Left"  VerticalAlignment="Top" RenderTransformOrigin="0.47,-0.325" />
+            HorizontalAlignment="Right"  VerticalAlignment="Top" RenderTransformOrigin="0.47,-0.325" />
 
-        <TextBox x:Name="tbxSW" Margin="406,55,0,0" Style="{StaticResource ssw_TextBoxStyle}" />
-        <TextBox x:Name="tbxMW" Margin="406,125,0,0" Style="{StaticResource ssw_TextBoxStyle}" />
-        <TextBox x:Name="tbxFM" Margin="406,195,0,0" Style="{StaticResource ssw_TextBoxStyle}" />
-        <TextBox x:Name="tbxDTV" Margin="406,325,0,0" Style="{StaticResource ssw_TextBoxStyle}" />
-        <TextBox x:Name="tbxAllHours" Width="80" Height="30" IsReadOnly="False" BorderThickness="0" FontSize="16"
+        <TextBox x:Name="tbxSW" Margin="469,46,0,0" Style="{StaticResource ssw_TextBoxStyle}" ToolTip="单击复制到剪切板"
+                 GotFocus="OnGotFocus" LostFocus="OnLostFocus" PreviewMouseDown="OnPreviewMouseDown"/>
+        <TextBox x:Name="tbxMW" Margin="469,115,0,0" Style="{StaticResource ssw_TextBoxStyle}" ToolTip="单击复制到剪切板"
+                 GotFocus="OnGotFocus" LostFocus="OnLostFocus" PreviewMouseDown="OnPreviewMouseDown"/>
+        <TextBox x:Name="tbxEXP" Margin="469,185,0,0" Style="{StaticResource ssw_TextBoxStyle}" ToolTip="单击复制到剪切板"
+                 GotFocus="OnGotFocus" LostFocus="OnLostFocus" PreviewMouseDown="OnPreviewMouseDown"/>
+        <TextBox x:Name="tbxFM" Margin="469,255,0,0" Style="{StaticResource ssw_TextBoxStyle}" ToolTip="单击复制到剪切板"
+                 GotFocus="OnGotFocus" LostFocus="OnLostFocus" PreviewMouseDown="OnPreviewMouseDown"/>
+        <TextBox x:Name="tbxDTV" Margin="469,325,0,0" Style="{StaticResource ssw_TextBoxStyle}" ToolTip="单击复制到剪切板"
+                 GotFocus="OnGotFocus" LostFocus="OnLostFocus" PreviewMouseDown="OnPreviewMouseDown"/>
+        <TextBox x:Name="tbxAllHours" Width="90" Height="30" Margin="0,400,10,0" 
+            HorizontalAlignment="Right" VerticalAlignment="Top"
             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-            HorizontalAlignment="Left"  Margin="401,396,0,0" 
-            TextWrapping="Wrap" Text="" VerticalAlignment="Top" RenderTransformOrigin="0.537,-0.273" />
+            IsReadOnly="True" BorderThickness="1" 
+            FontSize="16" FontWeight="Bold" FontFamily="Microsoft Yahei"
+            TextWrapping="Wrap" Text="1234567.8"   ToolTip="单击复制到剪切板"
+            GotFocus="OnGotFocus" LostFocus="OnLostFocus" PreviewMouseDown="OnPreviewMouseDown"/>
 
     </Grid>
 
