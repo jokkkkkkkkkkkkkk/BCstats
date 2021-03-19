@@ -237,7 +237,7 @@ namespace BCstats {
                             + "播出统计";
                         ssw.Show();
                         // 主窗口的位置：往左移，让软件的整个界面位置接近屏幕中央
-                        this.Left = this.Left - ssw.Width + 120;
+                        this.Left = this.Left - ssw.Width + 160;
                         this.Top = mwTop;
                     } else {
                         // 已打开子窗口，则刷新子窗口数据
@@ -1024,6 +1024,29 @@ namespace BCstats {
         #endregion
 
         #region 文本框 textbox 通用事件
+
+        #region 台站播出统计 文本框事件：单击全选，并且复制文本
+        public void OnLostFocus(object sender, RoutedEventArgs e) {
+            TextBox tb = e.Source as TextBox;
+            tb.PreviewMouseDown += new MouseButtonEventHandler(OnPreviewMouseDown);
+        }
+
+        public void OnPreviewMouseDown(object sender, MouseButtonEventArgs e) {
+            TextBox tb = e.Source as TextBox;
+            tb.Focus();
+            e.Handled = true;
+            // 复制文本框内容
+            Clipboard.SetDataObject(tb.Text);
+        }
+
+        public void OnGotFocus(object sender, RoutedEventArgs e) {
+            TextBox tb = e.Source as TextBox;
+            tb.SelectAll();
+            tb.PreviewMouseDown -= new MouseButtonEventHandler(OnPreviewMouseDown);
+        }
+        #endregion
+
+
         /// <summary>
         /// 停播率统计 屏蔽空格键
         /// </summary>
@@ -1309,6 +1332,8 @@ namespace BCstats {
 
             }
         }
+
+
 
         /// <summary>
         /// clrgrid1tb：月播出时间统计 控件初始化

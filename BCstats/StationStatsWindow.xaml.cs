@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-
+using System.Windows.Input;
 
 namespace BCstats {
     /// <summary>
@@ -112,6 +112,7 @@ namespace BCstats {
                 #region 各个类型的播出时长之和
                 double swHours = GetHoursByCategory(dt, BCstatsHelper.STR_SW);
                 double mwHours = GetHoursByCategory(dt, BCstatsHelper.STR_MW);
+                double expHours = GetHoursByCategory(dt, BCstatsHelper.STR_EXP);
                 double fmHours = GetHoursByCategory(dt, BCstatsHelper.STR_FM);
                 double tvHours = GetHoursByCategory(dt, BCstatsHelper.STR_TV);
 
@@ -119,15 +120,18 @@ namespace BCstats {
 
                 int swQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_SW);
                 int mwQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_MW);
+                int expQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_EXP);
                 int fmQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_FM);
                 int tvQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_TV);
                 lblSW.Content = BCstatsHelper.STR_SW_CN + "(" + swQuantity + ")";
                 lblMW.Content = BCstatsHelper.STR_MW_CN + "(" + mwQuantity + ")";
+                lblEXP.Content = BCstatsHelper.STR_EXP_CN + "(" + mwQuantity + ")";
                 lblFM.Content = BCstatsHelper.STR_FM_CN + "(" + fmQuantity + ")";
-                tbDTV.Text = BCstatsHelper.STR_TV_CN + "(" + tvQuantity + ")";
+                lblDTV.Content = BCstatsHelper.STR_TV_CN + "(" + tvQuantity + ")";
 
                 tbxSW.Text = swHours.ToString();
                 tbxMW.Text = mwHours.ToString();
+                tbxEXP.Text = expHours.ToString();
                 tbxFM.Text = fmHours.ToString();
                 tbxDTV.Text = tvHours.ToString();
                 tbxAllHours.Text = sumHours.ToString();
@@ -293,6 +297,7 @@ namespace BCstats {
             mw.Top = MainWindow.mwTop;
 
         }
+        
         /// <summary>
         /// 按钮：刷新统计数据
         /// </summary>
@@ -303,6 +308,27 @@ namespace BCstats {
         }
 
 
+
+        #region 统计结果 文本框事件：单击全选，并且复制文本
+        public void OnLostFocus(object sender, RoutedEventArgs e) {
+            TextBox tb = e.Source as TextBox;
+            tb.PreviewMouseDown += new MouseButtonEventHandler(OnPreviewMouseDown);
+        }
+
+        public void OnPreviewMouseDown(object sender, MouseButtonEventArgs e) {
+            TextBox tb = e.Source as TextBox;
+            tb.Focus();
+            e.Handled = true;
+            // 复制文本框内容
+            Clipboard.SetDataObject(tb.Text);
+        }
+
+        public void OnGotFocus(object sender, RoutedEventArgs e) {
+            TextBox tb = e.Source as TextBox;
+            tb.SelectAll();
+            tb.PreviewMouseDown -= new MouseButtonEventHandler(OnPreviewMouseDown);
+        }
+        #endregion
     }
 
 }

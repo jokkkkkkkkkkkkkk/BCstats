@@ -45,10 +45,12 @@ public sealed class BCstatsHelper {
 
     public const string STR_SW = "sw";
     public const string STR_MW = "mw";
+    public const string STR_EXP = "exp";
     public const string STR_FM = "fm";
     public const string STR_TV = "tv";
     public const string STR_SW_CN = "短波";
     public const string STR_MW_CN = "中波";
+    public const string STR_EXP_CN = "实验";
     public const string STR_FM_CN = "调频";
     public const string STR_TV_CN = "数字电视";
 

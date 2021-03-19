@@ -232,9 +232,10 @@
 
                 <TextBox Height="40" HorizontalAlignment="Left" HorizontalContentAlignment="Center" 
                          IsEnabled="True"                         
-                         IsReadOnly="True"                                           
-                         Margin="500,182,0,0" 
+                         IsReadOnly="True" ToolTip="单击复制到剪切板"                                    
+                         Margin="500,182,0,0"  
                          Name="Hours" TextAlignment="Center" VerticalAlignment="Top"
+                         GotFocus="OnGotFocus" LostFocus="OnLostFocus" PreviewMouseDown="OnPreviewMouseDown"
                          VerticalContentAlignment="Center" Width="80" />
 
                 <ScrollBar x:Name="scbNoStop2"
@@ -540,9 +541,10 @@
 
 
                 <TextBox Name="tbxTotalHours"  IsEnabled="True" IsReadOnly="True" Height="40" Width="70" 
-                         Margin="169.4,331,0,0" TextAlignment="Center"
+                         Margin="169.4,331,0,0" TextAlignment="Center" ToolTip="单击复制到剪切板"
                          HorizontalAlignment="Left" HorizontalContentAlignment="Center" 
                          VerticalAlignment="Top" VerticalContentAlignment="Center" 
+                         GotFocus="OnGotFocus" LostFocus="OnLostFocus" PreviewMouseDown="OnPreviewMouseDown"
                          Grid.Column="1">
                 </TextBox>
 
