@@ -125,7 +125,7 @@ namespace BCstats {
                 int tvQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_TV);
                 lblSW.Content = BCstatsHelper.STR_SW_CN + "(" + swQuantity + ")";
                 lblMW.Content = BCstatsHelper.STR_MW_CN + "(" + mwQuantity + ")";
-                lblEXP.Content = BCstatsHelper.STR_EXP_CN + "(" + mwQuantity + ")";
+                lblEXP.Content = BCstatsHelper.STR_EXP_CN + "(" + expQuantity + ")";
                 lblFM.Content = BCstatsHelper.STR_FM_CN + "(" + fmQuantity + ")";
                 lblDTV.Content = BCstatsHelper.STR_TV_CN + "(" + tvQuantity + ")";
 
