@@ -49,7 +49,7 @@ namespace BCstats {
                         // 将表对象作为DataGrid的数据源
                         TimeTableWindow_dataGrid1.ItemsSource = dt.DefaultView;
                         // 数据排序:根据台站名称
-                        (TimeTableWindow_dataGrid1.ItemsSource as DataView).Sort = BCstatsHelper.STR_STATION;
+                        (TimeTableWindow_dataGrid1.ItemsSource as DataView).Sort = BCstatsHelper.STR_CATEGORY;
                         // 禁止用户排序
                         TimeTableWindow_dataGrid1.CanUserSortColumns = false;
                         // 阻止最后一行的空行
@@ -292,7 +292,7 @@ namespace BCstats {
             mw.tbxTotalHours.Text = string.Empty;
             mw.lblDetail.Text = string.Empty;
             mw.Hours.Text = string.Empty;
-            mw.rbtnLastTuesday.IsChecked = false;
+            mw.chkBoxLastTuesday.IsChecked = false;
             mw.chkBox_Tuesday.IsChecked = false;
             // 关闭台站播出统计子窗口
             //if (Application.Current.Windows.Count > 2) {
