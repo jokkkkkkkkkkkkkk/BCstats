@@ -95,7 +95,7 @@ namespace BCstats {
                     dr[BCstatsHelper.STR_FREQUENCY] = frequencyList[i];
                     // 各节目的播出时长
                     dr[BCstatsHelper.STR_HOURS] = GetFrequencyHours(year, month,
-                        mw.rbtnLastTuesday, nostop2, nostop3,
+                        mw.chkBoxLastTuesday, nostop2, nostop3,
                         city, station, frequencyList[i]);
                     dt.Rows.Add(dr);
                 }
@@ -146,7 +146,7 @@ namespace BCstats {
         /// </summary>
         /// <param name="year"></param>
         /// <param name="month"></param>
-        /// <param name="rbtnLastTuesday"></param>
+        /// <param name="chkBoxLastTuesday"></param>
         /// <param name="nostop2"></param>
         /// <param name="nostop3"></param>
         /// <param name="city"></param>
@@ -154,7 +154,7 @@ namespace BCstats {
         /// <param name="frequency"></param>
         /// <returns></returns>
         private string GetFrequencyHours(int year, int month, 
-            RadioButton rbtnLastTuesday, int nostop2, int nostop3,
+            CheckBox chkBoxLastTuesday, int nostop2, int nostop3,
             string city, string station, string frequency) {
             try {
                 double off_time_hour, off_time_min, on_time_hour, on_time_min;
@@ -213,11 +213,11 @@ namespace BCstats {
                     frequency, BCstatsHelper.STR_STOP_LAST_2);
                 if (stop_last_2 == 1) {
                     stopLast2 = true;
-                    rbtnLastTuesday.IsChecked = true;
+                    chkBoxLastTuesday.IsChecked = true;
                     // 最后一个周二停机检修
                 } else {
                     stopLast2 = false;
-                    rbtnLastTuesday.IsChecked = false;
+                    chkBoxLastTuesday.IsChecked = false;
                     // 最后一个周二不停机检修
                 }
 
