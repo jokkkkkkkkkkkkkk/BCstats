@@ -292,7 +292,7 @@ namespace BCstats {
             mw.tbxTotalHours.Text = string.Empty;
             mw.lblDetail.Text = string.Empty;
             mw.Hours.Text = string.Empty;
-            mw.chkBoxLastTuesday.IsChecked = false;
+            mw.rbtnLastTuesday.IsChecked = false;
             mw.chkBox_Tuesday.IsChecked = false;
             // 关闭台站播出统计子窗口
             //if (Application.Current.Windows.Count > 2) {
