@@ -53,6 +53,7 @@ public sealed class BCstatsHelper {
     public const string STR_EXP_CN = "实验";
     public const string STR_FM_CN = "调频";
     public const string STR_TV_CN = "数字电视";
+    public const string STR_TOTAL_CN = "总 计";
 
 
 
