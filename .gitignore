@@ -93,3 +93,5 @@ $RECYCLE.BIN/
 _NCrunch*
 
 !.cs
+
+*.dat
