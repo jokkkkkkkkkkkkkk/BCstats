@@ -24,125 +24,143 @@ namespace BCstats {
         }
 
         /// <summary>
-        /// 初始化
+        /// 界面初始化
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void StationStatsWindow_Loaded(object sender, RoutedEventArgs e) {
-            this.GetStationBCStats();
+            this.GetStationBCStats(null);
         }
 
         /// <summary>
         /// 获取台站当月的各种播出时长数据
         /// </summary>
-        public void GetStationBCStats() {
+        public void GetStationBCStats(CheckBox chkBoxLastTuesday) {
             // 获取主窗口的控件状态信息
             MainWindow mw = Application.Current.Windows[0] as MainWindow;
             DataTable dt = new DataTable();
 
-            if (mw.cboxCity.SelectedIndex != -1
-                && mw.cboxStation.SelectedIndex != -1
-                && sqliteHelper.CheckDataBase(BCstatsHelper.dbFileName)
-                && sqliteHelper.CheckDataTable(BCstatsHelper.connectionString, BCstatsHelper.tableName)) {
+            try {
+                if (mw.cboxCity.SelectedIndex != -1
+                    && mw.cboxStation.SelectedIndex != -1
+                    && sqliteHelper.CheckDataBase(BCstatsHelper.dbFileName)
+                    && sqliteHelper.CheckDataTable(BCstatsHelper.connectionString, BCstatsHelper.tableName)) {
 
-                #region 读写控件状态
-                int year = Convert.ToInt32(mw.scbYear.Value);
-                int month = Convert.ToInt32(mw.scbMonth.Value);
+                    #region 读写控件状态
+                    int year = Convert.ToInt32(mw.scbYear.Value);
+                    int month = Convert.ToInt32(mw.scbMonth.Value);
 
-                this.Title = mw.cboxStation.Text + " "
-                        + mw.scbYear.Value.ToString() + "年"
-                        + mw.scbMonth.Value.ToString() + "月"
-                        + "播出统计";
+                    this.Title = mw.cboxStation.Text + " "
+                            + mw.scbYear.Value.ToString() + "年"
+                            + mw.scbMonth.Value.ToString() + "月"
+                            + "播出统计";
 
-                int nostop2 = Convert.ToInt16(mw.scbNoStop2.Value);
-                int nostop3 = Convert.ToInt16(mw.scbNoStop3.Value);
+                    int nostop2 = Convert.ToInt16(mw.scbNoStop2.Value);
+                    int nostop3 = Convert.ToInt16(mw.scbNoStop3.Value);
 
-                string city = mw.cboxCity.Text;
-                string station = mw.cboxStation.Text;
-                #endregion
+                    string city = mw.cboxCity.Text;
+                    string station = mw.cboxStation.Text;
+                    #endregion
 
-                #region 读取数据库，生成 DataTable 到 DataGrid
-                // 台站的所有节目数量，各种类型的节目数量
-                int total = sqliteHelper.GetDataCounBy(BCstatsHelper.connectionString, BCstatsHelper.tableName,
-                    BCstatsHelper.STR_STATION, station);
+                    #region 读取数据库，生成 DataTable 到 DataGrid
+                    // 台站的所有节目数量，各种类型的节目数量
+                    int total = sqliteHelper.GetDataCounBy(BCstatsHelper.connectionString, BCstatsHelper.tableName,
+                        BCstatsHelper.STR_STATION, station);
 
-                string tableName = BCstatsHelper.tableName;
+                    string tableName = BCstatsHelper.tableName;
 
-                // 列表：节目类型
-                List<string> categoryList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString, tableName,
-                    BCstatsHelper.STR_CATEGORY,
-                    BCstatsHelper.STR_STATION, station);
-                // 列表：节目名称
-                List<string> nameList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString, tableName,
-                    BCstatsHelper.STR_NAME,
-                    BCstatsHelper.STR_STATION, station);
-                // 列表：节目频率
-                List<string> frequencyList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString, tableName,
-                    BCstatsHelper.STR_FREQUENCY,
-                    BCstatsHelper.STR_STATION, station);
-                // DataTable 定义列
-                dt.Columns.Add(BCstatsHelper.STR_STATION);
-                dt.Columns.Add(BCstatsHelper.STR_CATEGORY);
-                dt.Columns.Add(BCstatsHelper.STR_NAME);
-                dt.Columns.Add(BCstatsHelper.STR_FREQUENCY);
-                dt.Columns.Add(BCstatsHelper.STR_HOURS);
+                    // 列表：节目类型
+                    List<string> categoryList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString, tableName,
+                        BCstatsHelper.STR_CATEGORY,
+                        BCstatsHelper.STR_STATION, station);
+                    // 列表：节目名称
+                    List<string> nameList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString, tableName,
+                        BCstatsHelper.STR_NAME,
+                        BCstatsHelper.STR_STATION, station);
+                    // 列表：节目频率
+                    List<string> frequencyList = sqliteHelper.GetColunmValues(BCstatsHelper.connectionString, tableName,
+                        BCstatsHelper.STR_FREQUENCY,
+                        BCstatsHelper.STR_STATION, station);
+                    // DataTable 定义列
+                    dt.Columns.Add(BCstatsHelper.STR_STATION);
+                    dt.Columns.Add(BCstatsHelper.STR_CATEGORY);
+                    dt.Columns.Add(BCstatsHelper.STR_NAME);
+                    dt.Columns.Add(BCstatsHelper.STR_FREQUENCY);
+                    dt.Columns.Add(BCstatsHelper.STR_HOURS);
 
-                // DataTable 填充数据
-                for (int i = 0; i < total; i++) {
-                    DataRow dr = dt.NewRow();
-                    dr[BCstatsHelper.STR_CATEGORY] = categoryList[i];
-                    dr[BCstatsHelper.STR_NAME] = nameList[i];
-                    dr[BCstatsHelper.STR_FREQUENCY] = frequencyList[i];
-                    // 各节目的播出时长
-                    dr[BCstatsHelper.STR_HOURS] = GetFrequencyHours(year, month,
-                        mw.chkBoxLastTuesday, nostop2, nostop3,
-                        city, station, frequencyList[i]);
-                    dt.Rows.Add(dr);
+                    //MessageBox.Show("1");
+                    // DataTable 填充数据
+                    for (int i = 0; i < total; i++) {
+                        DataRow dr = dt.NewRow();
+                        dr[BCstatsHelper.STR_CATEGORY] = categoryList[i];
+                        dr[BCstatsHelper.STR_NAME] = nameList[i];
+                        dr[BCstatsHelper.STR_FREQUENCY] = frequencyList[i];
+
+                        // 各节目的播出时长
+                        if(chkBoxLastTuesday != null) {
+                            dr[BCstatsHelper.STR_HOURS] = GetFrequencyHours(sqliteHelper,
+                                year, month,
+                                this.chkBoxLastTuesday, nostop2, nostop3,
+                                city, station, frequencyList[i]);
+                        } else {
+                            dr[BCstatsHelper.STR_HOURS] = GetFrequencyHours(sqliteHelper,
+                                year, month,
+                                null,
+                                nostop2, nostop3,
+                                city, station, frequencyList[i]);
+                        }
+
+                        dt.Rows.Add(dr);
+                    }
+                    //MessageBox.Show("2");
+                    // 绑定数据
+                    StationStats_DataGrid.ItemsSource = dt.DefaultView;
+                    // 数据排序:根据节目类型
+                    (StationStats_DataGrid.ItemsSource as DataView).Sort = BCstatsHelper.STR_CATEGORY;
+                    StationStats_DataGrid.CanUserDeleteRows = false;
+                    StationStats_DataGrid.CanUserAddRows = false;
+                    StationStats_DataGrid.CanUserSortColumns = true;
+                    #endregion
+
+                    #region 各个类型的播出时长之和
+                    double swHours = GetHoursByCategory(dt, BCstatsHelper.STR_SW);
+                    double mwHours = GetHoursByCategory(dt, BCstatsHelper.STR_MW);
+                    double expHours = GetHoursByCategory(dt, BCstatsHelper.STR_EXP);
+                    double fmHours = GetHoursByCategory(dt, BCstatsHelper.STR_FM);
+                    double tvHours = GetHoursByCategory(dt, BCstatsHelper.STR_TV);
+
+                    double sumHours = swHours + mwHours + fmHours + tvHours;
+
+                    int swQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_SW);
+                    int mwQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_MW);
+                    int expQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_EXP);
+                    int fmQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_FM);
+                    int tvQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_TV);
+                    lblSW.Content = BCstatsHelper.STR_SW_CN + "(" + swQuantity + ")";
+                    lblMW.Content = BCstatsHelper.STR_MW_CN + "(" + mwQuantity + ")";
+                    lblEXP.Content = BCstatsHelper.STR_EXP_CN + "(" + expQuantity + ")";
+                    lblFM.Content = BCstatsHelper.STR_FM_CN + "(" + fmQuantity + ")";
+                    lblDTV.Content = BCstatsHelper.STR_TV_CN + "(" + tvQuantity + ")";
+                    lblAllHours.Content = BCstatsHelper.STR_TOTAL_CN + "(" + total + ")";
+
+
+                    tbxSW.Text = swHours.ToString();
+                    tbxMW.Text = mwHours.ToString();
+                    tbxEXP.Text = expHours.ToString();
+                    tbxFM.Text = fmHours.ToString();
+                    tbxDTV.Text = tvHours.ToString();
+                    tbxAllHours.Text = sumHours.ToString();
+                    #endregion
                 }
-
-                // 绑定数据
-                StationStats_DataGrid.ItemsSource = dt.DefaultView;
-                // 数据排序:根据节目类型
-                (StationStats_DataGrid.ItemsSource as DataView).Sort = BCstatsHelper.STR_CATEGORY;
-                StationStats_DataGrid.CanUserDeleteRows = false;
-                StationStats_DataGrid.CanUserAddRows = false;
-                StationStats_DataGrid.CanUserSortColumns = true;
-                #endregion
-
-                #region 各个类型的播出时长之和
-                double swHours = GetHoursByCategory(dt, BCstatsHelper.STR_SW);
-                double mwHours = GetHoursByCategory(dt, BCstatsHelper.STR_MW);
-                double expHours = GetHoursByCategory(dt, BCstatsHelper.STR_EXP);
-                double fmHours = GetHoursByCategory(dt, BCstatsHelper.STR_FM);
-                double tvHours = GetHoursByCategory(dt, BCstatsHelper.STR_TV);
-
-                double sumHours = swHours + mwHours + fmHours + tvHours;
-
-                int swQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_SW);
-                int mwQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_MW);
-                int expQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_EXP);
-                int fmQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_FM);
-                int tvQuantity = GetQuantityByCategory(dt, BCstatsHelper.STR_TV);
-                lblSW.Content = BCstatsHelper.STR_SW_CN + "(" + swQuantity + ")";
-                lblMW.Content = BCstatsHelper.STR_MW_CN + "(" + mwQuantity + ")";
-                lblEXP.Content = BCstatsHelper.STR_EXP_CN + "(" + expQuantity + ")";
-                lblFM.Content = BCstatsHelper.STR_FM_CN + "(" + fmQuantity + ")";
-                lblDTV.Content = BCstatsHelper.STR_TV_CN + "(" + tvQuantity + ")";
-
-                tbxSW.Text = swHours.ToString();
-                tbxMW.Text = mwHours.ToString();
-                tbxEXP.Text = expHours.ToString();
-                tbxFM.Text = fmHours.ToString();
-                tbxDTV.Text = tvHours.ToString();
-                tbxAllHours.Text = sumHours.ToString();
-                #endregion
+            } catch(Exception ex) {
+                ;
+                //MessageBox.Show(ex.ToString());
             }
-        
         }
-
 
         /// <summary>
         /// 某个市的某个台站的某个节目的某年某月的播出时长
+        /// 从数据库读取信息；从界面上的复选框(chkBoxLastTuesday)读取最后周二是否停机检修
         /// </summary>
         /// <param name="year"></param>
         /// <param name="month"></param>
@@ -153,15 +171,16 @@ namespace BCstats {
         /// <param name="station"></param>
         /// <param name="frequency"></param>
         /// <returns></returns>
-        private string GetFrequencyHours(int year, int month, 
+        public string GetFrequencyHours(SQLiteHelper sqliteHelper,
+            int year, int month,
             CheckBox chkBoxLastTuesday, int nostop2, int nostop3,
             string city, string station, string frequency) {
             try {
                 double off_time_hour, off_time_min, on_time_hour, on_time_min;
                 bool stop3, stop2, stopLast2;
-                double off_time_2_hour, off_time_2_min,on_time_2_hour, on_time_2_min;
-                double off_time_3_hour, off_time_3_min,on_time_3_hour, on_time_3_min;
-
+                double off_time_2_hour, off_time_2_min, on_time_2_hour, on_time_2_min;
+                double off_time_3_hour, off_time_3_min, on_time_3_hour, on_time_3_min;
+                // 从数据库读取信息
                 // 停止播出
                 string off_time = sqliteHelper.GetTimeValue(city, station,
                     frequency, BCstatsHelper.STR_OFF_TIME);
@@ -208,17 +227,26 @@ namespace BCstats {
                 on_time_2_hour = Convert.ToDouble(on_time_2.Substring(0, 2));
                 on_time_2_min = Convert.ToDouble(on_time_2.Substring(2, 2));
 
-                // 最后一个周二是否停机检修
-                int stop_last_2 = sqliteHelper.GetIntValue(city, station,
-                    frequency, BCstatsHelper.STR_STOP_LAST_2);
-                if (stop_last_2 == 1) {
-                    stopLast2 = true;
-                    chkBoxLastTuesday.IsChecked = true;
-                    // 最后一个周二停机检修
+
+
+                if(chkBoxLastTuesday == null) {
+                    //从数据库读取信息：最后一个周二是否停机检修
+                    int stop_last_2 = sqliteHelper.GetIntValue(city, station,
+                        frequency, BCstatsHelper.STR_STOP_LAST_2);
+                    if (stop_last_2 == 1) {
+                        stopLast2 = true;
+                        // 最后一个周二停机检修
+                    } else {
+                        stopLast2 = false;
+                        // 最后一个周二不停机检修
+                    }
                 } else {
-                    stopLast2 = false;
-                    chkBoxLastTuesday.IsChecked = false;
-                    // 最后一个周二不停机检修
+                    // 从界面上的复选框读取信息：最后一个周二，是否停机检修？
+                    if (chkBoxLastTuesday.IsChecked == true) {
+                        stopLast2 = true;
+                    } else {
+                        stopLast2 = false;
+                    }
                 }
 
                 Tuple<double, string> t = BCstatsHelper.TotalHoursOfTheMonth(
@@ -241,6 +269,7 @@ namespace BCstats {
             }
         }
 
+        
 
         /// <summary>
         /// 获取DataTable中某个类型节目的播出时长之和
@@ -289,7 +318,7 @@ namespace BCstats {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btn_ss_quit_Click(object sender, RoutedEventArgs e) {
+        public void btn_ss_quit_Click(object sender, RoutedEventArgs e) {
             this.Close();
             // 主窗口位置恢复到屏幕中央
             MainWindow mw = Application.Current.Windows[0] as MainWindow;
@@ -306,6 +335,20 @@ namespace BCstats {
         public void btn_ss_refresh_Click(object sender, RoutedEventArgs e) {
             StationStatsWindow_Loaded(sender, e);
         }
+
+
+
+                #region TabItem3 台站播出统计 复选框事件 每月最后周二 
+        private void chkBoxLastTuesday_Checked(object sender, RoutedEventArgs e) {
+            this.GetStationBCStats(this.chkBoxLastTuesday);
+        }
+
+        private void chkBoxLastTuesday_Unchecked(object sender, RoutedEventArgs e) {
+            this.GetStationBCStats(this.chkBoxLastTuesday);
+        }
+        #endregion
+
+
 
 
 
@@ -329,6 +372,8 @@ namespace BCstats {
             tb.PreviewMouseDown -= new MouseButtonEventHandler(OnPreviewMouseDown);
         }
         #endregion
+
+
     }
 
 }
