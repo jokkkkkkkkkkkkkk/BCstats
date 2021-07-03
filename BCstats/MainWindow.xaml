@@ -192,7 +192,7 @@
             <EventSetter Event="TextBox.PreviewMouseDown" Handler="timebox_PreviewMouseDown"/>
             <EventSetter Event="TextBox.PreviewKeyDown" Handler="timebox_PreviewKeyDown"/>
         </Style>
-   
+
     </Window.Resources>
 
 
@@ -241,14 +241,14 @@
                          GotFocus="OnGotFocus" LostFocus="OnLostFocus" PreviewMouseDown="OnPreviewMouseDown"
                          VerticalContentAlignment="Center" Width="80" />
 
-                <ScrollBar x:Name="scbNoStop2"
+                <ScrollBar x:Name="scbNoStop2" Visibility="Hidden"
                            HorizontalAlignment="Left" VerticalAlignment="Top"                
                            Margin="229,164,0,0"  
                            Style="{DynamicResource MySimpleScrollBar}"                  
                            Value="0" SmallChange="1"
                            Minimum="0" Scroll="tabItem3_ScrollBar_Scroll" />
 
-                <ScrollBar x:Name="scbNoStop3"
+                <ScrollBar x:Name="scbNoStop3" Visibility="Hidden"
                            HorizontalAlignment="Left" VerticalAlignment="Top"                
                            Margin="229,209,0,0"  
                            Style="{DynamicResource MySimpleScrollBar}"                  
@@ -267,14 +267,17 @@
                    Style="{DynamicResource MySimpleScrollBar}" SmallChange="1"
                    Maximum="12" Scroll="scbMonth_Scroll" />
 
+                
+                
+                
 
                 <Label Content="台站名称" Width="140" FontSize="18"
                        HorizontalAlignment="Left" Margin="155,72,0,0" Name="label12" VerticalAlignment="Top" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                 <Label Content="节目频率" FontSize="18" HorizontalContentAlignment="Center" Width="250"
                        HorizontalAlignment="Left" Margin="330,72,0,0" Name="label15" VerticalAlignment="Top" VerticalContentAlignment="Center" />
                 <Label Content="系统时间" Height="30" HorizontalAlignment="Left" Margin="286,384,0,0" Name="lblNow3" VerticalAlignment="Top" Width="200" />
-                <Label Content="共几个周二不停机检修" FontSize="18" Height="30" HorizontalAlignment="Left" Margin="29,164,0,0" Name="label16" VerticalAlignment="Top" Width="190" />
-                <Label Content="共几个周三不停机检修" FontSize="18" Height="30" HorizontalAlignment="Left" Margin="29,209,0,0" Name="label19" VerticalAlignment="Top" Width="190" />
+                <Label Content="周二不停机检修" FontSize="18" Height="30" HorizontalAlignment="Left" Margin="29,164,0,0" Name="label16" VerticalAlignment="Top" Width="150" />
+                <Label Content="周三不停机检修" FontSize="18" Height="30" HorizontalAlignment="Left" Margin="29,209,0,0" Name="label19" VerticalAlignment="Top" Width="150" />
 
 
 
@@ -282,8 +285,10 @@
 
 
 
-                <Button Content="频率时间表设置" Height="40" HorizontalAlignment="Left" Margin="460,238,0,0" 
-                        Name="btnPopup_TimeTable" VerticalAlignment="Top" Width="120" Click="btnPopup_TimeTable_Click" RenderTransformOrigin="0.537,0.527" />
+                <Button Content="频率时间表设置" x:Name="btnPopup_TimeTable" 
+                        Height="40"  Width="120"
+                        VerticalAlignment="Top" HorizontalAlignment="Left" Margin="460,238,0,0" 
+                        Click="btnPopup_TimeTable_Click"  />
 
                 <Label x:Name="labelTotalhours" Content="该频率播出时长(小时)" 
                        FontSize="20"  Width="210" Height="40" 
@@ -304,7 +309,27 @@
                              />
 
 
-
+                <Viewbox x:Name="vbNonStopTuesday" Visibility="Visible">
+                    <Calendar x:Name="cdrNonStopTuesday"  FirstDayOfWeek="Monday"
+                              Margin="10,52,-10,-52" Width="190" Height="220" 
+                              IsTodayHighlighted="True"
+                              SelectionMode="MultipleRange"
+                              DisplayDateStart="2020/01/01"
+                    />
+                </Viewbox>
+                
+                <Button x:Name="btnOpen_cdrNonStopTuesday" Content="选择日期" 
+                        Height="30" Width="70"
+                        HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="187,166,0,0"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                        Click="btnOpen_cdrNonStopTuesday_Click"
+                        />
+                <Button x:Name="btnYes_cdrNonStopTuesday" Content="确定"  Visibility="Hidden"
+                        HorizontalAlignment="Left" Margin="420,384,0,0" VerticalAlignment="Top" 
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                        Width="75" Height="20" 
+                        Click="btnYes_cdrNonStopTuesday_Click"
+                        />
 
             </Grid>
         </TabItem>

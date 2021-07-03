@@ -88,6 +88,11 @@ namespace BCstats {
                 // 滚动条：初始化，显示的值
                 scbNoStop2.Value = 0;
                 scbNoStop3.Value = 0;
+
+                // 日历：初始化
+                cdrNonStopTuesday.Visibility = Visibility.Hidden;
+                btnYes_cdrNonStopTuesday.Visibility = Visibility.Hidden;
+
                 #endregion
 
                 #region 月播出时间统计 初始化
@@ -253,6 +258,59 @@ namespace BCstats {
                 ;
             }
         }
+
+        /// <summary>
+        /// 台站播出统计：按钮 弹出日历，选择不停机检修的周二
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnOpen_cdrNonStopTuesday_Click(object sender, RoutedEventArgs e) {
+            string strDateEnd =
+                scbYear.Value.ToString() + "-"
+                + scbMonth.Value.ToString() + "-"
+                + "01";
+            DateTime theMonthDateTime = Convert.ToDateTime(strDateEnd);
+            // 日历的显示起止时间：根据 scrollBar 的值来设置
+            cdrNonStopTuesday.DisplayDateStart = BCstatsHelper.FirstDayOfTheMonth(theMonthDateTime);
+            cdrNonStopTuesday.DisplayDateEnd = BCstatsHelper.LastDayOfTheMonth(theMonthDateTime);
+            // 显示日历
+            cdrNonStopTuesday.Visibility = Visibility.Visible;
+            // 隐藏 选择日期 按钮，显示 确认 按钮
+            btnOpen_cdrNonStopTuesday.Visibility = Visibility.Hidden;
+            btnYes_cdrNonStopTuesday.Visibility = Visibility.Visible;
+
+            int theYear = (int)scbYear.Value;
+            int theMonth = (int)scbMonth.Value;
+            int daysTheMonth = BCstatsHelper.DaysCountOfTheMonth(theYear, theMonth);
+            int daysLastTheMonth = BCstatsHelper.DaysCountOfTheMonth(theYear, theMonth - 1);
+            // 添加不能选择的日历范围:从当年的第一天 至 当月的上个月的最后一天
+            cdrNonStopTuesday.BlackoutDates.Add(
+                new CalendarDateRange(
+                    new DateTime(theYear, 1, 1),
+                    new DateTime(theYear, theMonth - 1, daysLastTheMonth)));
+            // 添加不能选择的日历范围:非周二
+
+            //for (int i = 0; i < cdrNonStopTuesday.SelectedDates.Count; i++) {
+            //    MessageBox.Show(cdrNonStopTuesday.SelectedDates[i].ToString());
+            //}
+        }
+
+        /// <summary>
+        /// 台站播出统计：按钮 确定日历选择日期，选择不停机检修的周二
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnYes_cdrNonStopTuesday_Click(object sender, RoutedEventArgs e) {
+            // 清楚：之前设置的不可选择的范围
+            cdrNonStopTuesday.BlackoutDates.Clear();
+            cdrNonStopTuesday.Visibility = Visibility.Hidden;
+            
+            btnOpen_cdrNonStopTuesday.Visibility = Visibility.Visible;
+            btnYes_cdrNonStopTuesday.Visibility = Visibility.Hidden;
+            
+        }
+
+
 
 
         /// <summary>
@@ -1325,6 +1383,8 @@ namespace BCstats {
 
             }
         }
+
+
 
         /// <summary>
         /// clrgrid1tb：月播出时间统计 控件初始化
