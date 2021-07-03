@@ -67,6 +67,28 @@ public sealed class BCstatsHelper {
     #endregion
 
 
+
+    /// 取得某月的第一天
+    /// </summary>
+    /// <param name="datetime">要取得月份第一天的时间</param>
+    /// <returns></returns>
+    public static DateTime FirstDayOfTheMonth(DateTime datetime) {
+        return datetime.AddDays(1 - datetime.Day);
+    }
+ 
+    ///<summary>
+    /// 取得某月的最后一天
+    /// </summary>
+    /// <param name="datetime">要取得月份最后一天的时间</param>
+    /// <returns></returns>
+    public static DateTime LastDayOfTheMonth(DateTime datetime) {
+        return datetime.AddDays(1 - datetime.Day).AddMonths(1).AddDays(-1);
+    }
+
+
+
+
+
     /// <summary> 
     /// 统计一段时间内有多少个星期几 
     /// </summary> 
